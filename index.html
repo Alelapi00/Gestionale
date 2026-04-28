@@ -43,8 +43,7 @@ button{border:0;border-radius:12px;padding:10px 13px;background:var(--dark);colo
   <div style="background:white;padding:30px;border-radius:12px;text-align:center;width:300px;">
     <h2>Origo Accesso</h2>
     <input id="passwordInput" type="password" placeholder="Password" style="width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:8px;">
-    <button onclick="checkPassword()" style="padding:10px 20px;background:black;color:white;border:none;border-radius:8px;">Entra</button>
-    <p id="errorMsg" style="color:red;font-size:12px;"></p>
+<button type="button" onclick="checkPassword()" style="padding:10px 20px;background:black;color:white;border:none;border-radius:8px;">Entra</button>    <p id="errorMsg" style="color:red;font-size:12px;"></p>
   </div>
 </div>
 <div id="loginScreen" style="position:fixed;inset:0;background:#0b0f17;display:flex;align-items:center;justify-content:center;z-index:99999;">
@@ -794,21 +793,33 @@ render();
 </script>
 
 <script>
-const ORIGO_PASSWORD = "origo123"; // cambia questa password da GitHub, se vuoi
-function checkPassword(){
-  const input = document.getElementById("passwordInput").value;
-  if(input === ORIGO_PASSWORD){
-    document.getElementById("loginScreen").style.display = "none";
+const PASSWORD = "origo123";
+
+function checkPassword() {
+  const input = document.getElementById("passwordInput").value.trim();
+  const error = document.getElementById("errorMsg");
+  const login = document.getElementById("loginScreen");
+
+  if (input === PASSWORD) {
+    login.style.display = "none";
     localStorage.setItem("auth_origo", "true");
   } else {
-    document.getElementById("errorMsg").innerText = "Password errata";
+    error.innerText = "Password errata";
   }
 }
-window.addEventListener("load", function(){
-  if(localStorage.getItem("auth_origo") === "true"){
-    const el=document.getElementById("loginScreen");
-    if(el) el.style.display="none";
+
+document.addEventListener("DOMContentLoaded", function() {
+  const input = document.getElementById("passwordInput");
+
+  if (localStorage.getItem("auth_origo") === "true") {
+    document.getElementById("loginScreen").style.display = "none";
   }
+
+  input.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      checkPassword();
+    }
+  });
 });
 </script>
   <script>
