@@ -719,11 +719,6 @@ function importFromSheet(){
       setSyncStatus('Errore import: ' + err.message, 'err');
     });
 }
-  script.onerror=()=>{ setSyncStatus('Errore import: controlla URL Web App e permessi di accesso.', 'err'); delete window[callback]; script.remove(); };
-  setSyncStatus('Import da Google Sheet in corso...');
-  script.src=`${url}${sep}action=read&callback=${callback}&t=${Date.now()}`;
-  document.body.appendChild(script);
-}
 function exportToSheet(){
   const url=getSheetUrl();
   if(!url){ alert('Incolla prima l’URL della Web App Apps Script.'); return; }
