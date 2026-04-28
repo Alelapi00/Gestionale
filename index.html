@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestionale Resell Origo - v10 Google Sheets collegato</title>
+<style>
+:root{--bg:#f5f1ea;--card:#fff;--text:#171717;--muted:#6b7280;--border:#ded6ca;--dark:#111827;--soft:#eee7dc;--green:#15803d;--red:#b91c1c;--blue:#1d4ed8;--amber:#b45309;--purple:#7c3aed}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text)}
+header{background:var(--dark);color:white;padding:26px 28px} h1{margin:0 0 6px;font-size:28px;letter-spacing:-.04em} header p{margin:0;color:#d1d5db}
+main{max-width:1600px;margin:0 auto;padding:22px}
+.cards{display:grid;grid-template-columns:repeat(6,minmax(145px,1fr));gap:14px;margin-bottom:16px}
+.card,.panel{background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:0 8px 22px rgba(17,24,39,.06)}
+.kpi{padding:16px}.label{font-size:12px;text-transform:uppercase;color:var(--muted);letter-spacing:.04em}.value{font-size:25px;font-weight:850;letter-spacing:-.04em;margin-top:6px}.hint{font-size:12px;color:var(--muted);margin-top:4px}
+.green{color:var(--green)}.red{color:var(--red)}.blue{color:var(--blue)}.amber{color:var(--amber)}.purple{color:var(--purple)}
+.tabs{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap}.tab{border:0;border-radius:999px;padding:10px 15px;background:var(--soft);color:var(--dark);font-weight:750;cursor:pointer}.tab.active{background:var(--dark);color:white}
+.panel{overflow:hidden;margin-bottom:18px}.panel-head{padding:15px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}.panel-head h2{margin:0;font-size:18px}.panel-head span{font-size:13px;color:var(--muted)}
+.toolbar{display:grid;grid-template-columns:1.4fr repeat(4,1fr) auto auto;gap:10px;margin-bottom:16px}
+input,select,textarea,button{font:inherit} input,select,textarea{width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 11px;background:#fff;outline:none} textarea{min-height:76px;resize:vertical}
+button{border:0;border-radius:12px;padding:10px 13px;background:var(--dark);color:white;font-weight:800;cursor:pointer;white-space:nowrap}button.secondary{background:var(--soft);color:var(--dark)}button.danger{background:var(--red)}button.small{padding:6px 9px;font-size:12px;border-radius:9px}
+.form{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px}.form .wide{grid-column:span 2}.form .full{grid-column:1/-1}
+.field label{display:block;font-size:12px;font-weight:800;color:#374151;margin:0 0 5px}.help{font-size:12px;color:var(--muted);margin-top:5px}.hidden{display:none!important}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:1280px}th,td{border-bottom:1px solid var(--border);padding:10px;text-align:left;vertical-align:middle;font-size:13px}th{background:#faf8f5;color:#4b5563;font-size:12px;text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0}td input,td select{padding:7px 8px;border-radius:9px;font-size:13px}.num{text-align:right}.sku{font-weight:850}.empty{padding:26px;text-align:center;color:var(--muted)}
+.progress{height:12px;background:#ede7dd;border-radius:999px;overflow:hidden;min-width:150px}.progress > div{height:100%;background:linear-gradient(90deg,#2563eb,#15803d);border-radius:999px}.progressLabel{font-size:12px;font-weight:800;color:#374151;margin-top:5px}
+.bale-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:18px}.bale-card{border:1px solid var(--border);border-radius:16px;padding:15px;background:#fff}.bale-title{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:12px}.bale-title h3{margin:0;font-size:18px}.mini{font-size:12px;color:var(--muted)}.bale-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}.metric{background:#faf8f5;border-radius:12px;padding:10px}.metric strong{display:block;font-size:15px;margin-top:4px}
+
+.dashboard-controls{display:grid;grid-template-columns:180px 180px 220px 1fr;gap:10px;padding:16px 18px;align-items:end}
+.dashboard-summary{display:grid;grid-template-columns:repeat(3,minmax(170px,1fr));gap:12px;padding:0 18px 18px}.dashboard-summary .metric{border:1px solid var(--border)}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;padding:18px}.calendar-head{font-size:12px;text-transform:uppercase;color:var(--muted);font-weight:850;text-align:center}.calendar-day{min-height:92px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:10px}.calendar-day.empty-day{background:#f3eee6;border-style:dashed}.calendar-date{font-size:12px;color:var(--muted);font-weight:850}.calendar-net{font-size:17px;font-weight:900;margin-top:12px}.calendar-meta{font-size:12px;color:var(--muted);margin-top:4px}
+@media(max-width:900px){.dashboard-controls{grid-template-columns:1fr}.dashboard-summary{grid-template-columns:1fr}.calendar-grid{grid-template-columns:1fr}.calendar-head{display:none}}
+.country-chips{display:flex;gap:8px;flex-wrap:wrap;padding:0 18px 16px}.country-chip{background:#faf8f5;border:1px solid var(--border);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:800}.country-chip strong{margin-left:6px}.country-note{padding:0 18px 14px;color:var(--muted);font-size:13px}.country-table table{min-width:900px}.country-cell{line-height:1.35}.country-cell strong{display:block}.country-cell span{font-size:12px;color:var(--muted)}
+
+.info{padding:16px 18px;background:#fff7ed;border-top:1px solid #fed7aa;color:#7c2d12;font-size:14px;line-height:1.45}
+@media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr}.form .wide{grid-column:auto}}
+
+.sync-box{background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:18px;display:grid;grid-template-columns:1.2fr auto auto auto;gap:10px;align-items:end;box-shadow:0 8px 22px rgba(31,41,51,.05)}
+.sync-box label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}.sync-status{font-size:13px;color:var(--muted);padding:8px 0}.sync-status.ok{color:var(--green)}.sync-status.err{color:var(--red)}
+@media(max-width:900px){.sync-box{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Gestionale Resell Origo</h1>
+  <p>Inventario, caricamento a sequenza, Bale, Dashboard vendite e sincronizzazione manuale con Google Sheets già collegata.</p>
+</header>
+<main>
+  <section class="cards">
+    <div class="card kpi"><div class="label">Pezzi totali</div><div class="value" id="kpiTot">0</div><div class="hint">tutti i capi caricati</div></div>
+    <div class="card kpi"><div class="label">Disponibili</div><div class="value blue" id="kpiDisp">0</div><div class="hint">ancora in stock</div></div>
+    <div class="card kpi"><div class="label">Bale attive</div><div class="value purple" id="kpiBale">0</div><div class="hint">gruppi/bale presenti</div></div>
+    <div class="card kpi"><div class="label">Investimento attivo</div><div class="value amber" id="kpiInv">€0,00</div><div class="hint">costo capi disponibili</div></div>
+    <div class="card kpi"><div class="label">Fatturato</div><div class="value green" id="kpiFat">€0,00</div><div class="hint">somma prezzi vendita</div></div>
+    <div class="card kpi"><div class="label">Guadagno netto</div><div class="value" id="kpiNet">€0,00</div><div class="hint">fatturato - costo venduti</div></div>
+  </section>
+
+  <section class="tabs">
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="inventario">Inventario</button>
+    <button class="tab" data-tab="bale">Bale</button>
+    <button class="tab" data-tab="paesi">Paesi</button>
+    <button class="tab" data-tab="aggiungi">Aggiungi</button>
+  </section>
+
+
+
+  <section class="sync-box">
+    <div>
+      <label>Google Sheets collegato</label>
+      <input id="sheetUrl" value="https://script.google.com/macros/s/AKfycbyM8eBcSYcDof_sj0qiXcqcH4KVJ9_6f9kBVs4uxLb8pKw3n69_0ZACk4fMXF6Qryrz/exec" readonly title="URL già inserito per il team">
+    </div>
+    <button class="secondary" id="saveSheetUrlBtn">Conferma URL</button>
+    <button id="importSheetBtn">Importa da Google Sheet</button>
+    <button id="exportSheetBtn">Esporta su Google Sheet</button>
+    <div class="sync-status" id="syncStatus">Sync manuale collegata: tutti usano la stessa tab ORIGO_GESTIONALE_SYNC del Google Sheet.</div>
+  </section>
+
+  <section id="inventario" class="tabpage hidden">
+    <div class="toolbar">
+      <input id="search" placeholder="Cerca SKU, gruppo, bale, paese, note...">
+      <select id="filterStato"><option value="">Tutti gli stati</option><option>disponibile</option><option>venduto</option></select>
+      <select id="filterBale"><option value="">Tutte le bale</option></select>
+      <select id="filterGruppo"><option value="">Tutti i gruppi</option></select>
+      <select id="sortBy"><option value="sku">Ordina per SKU</option><option value="bale">Ordina per bale</option><option value="gruppo">Ordina per gruppo</option><option value="costo_desc">Costo più alto</option><option value="vendita_desc">Vendita più alta</option></select>
+      <button class="secondary" id="exportBtn">Esporta CSV</button>
+      <button class="danger" id="resetBtn">Reset dati</button>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Inventario modificabile</h2><span>ogni riga resta modificabile singolarmente, anche se caricata in gruppo</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>SKU</th><th>Bale</th><th>Gruppo</th><th>Stato</th><th class="num">Costo</th><th class="num">Vendita</th><th class="num">Guadagno venduto</th><th>Data acquisto</th><th>Data vendita</th><th>Paese</th><th>Pagamento</th><th>Note</th><th></th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="bale" class="tabpage hidden">
+    <div class="panel">
+      <div class="panel-head"><h2>Bale</h2><span>avanzamento vendite, costo totale, guadagno effettivo e quanto manca a ripagare la bale</span></div>
+      <div class="bale-grid" id="baleCards"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Tabella Bale</h2><span>clicca “Vedi inventario” per filtrare i pezzi collegati</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Bale</th><th class="num">Pezzi</th><th class="num">Venduti</th><th>Completamento vendite</th><th class="num">Costo totale bale</th><th class="num">Fatturato venduto</th><th class="num">Guadagno effettivo</th><th class="num">Manca a ripagare</th><th class="num">ROI effettivo</th><th></th></tr></thead>
+          <tbody id="baleBody"></tbody>
+        </table>
+      </div>
+      <div class="info">Nel tab Bale il <strong>guadagno effettivo</strong> è calcolato solo sulle vendite realmente concluse: <strong>fatturato dei pezzi venduti - costo dei pezzi venduti</strong>. “Manca a ripagare” resta invece basato sul costo totale della bale.</div>
+    </div>
+  </section>
+
+
+  <section id="paesi" class="tabpage hidden">
+    <div class="panel">
+      <div class="panel-head"><h2>Paesi</h2><span>vendite divise per giorno e per paese: ogni paese inserito nelle vendite crea una nuova colonna</span></div>
+      <div class="dashboard-controls">
+        <div class="field"><label>Anno</label><select id="countryYear"></select></div>
+        <div class="field"><label>Mese</label><select id="countryMonth"></select></div>
+        <div class="help">La sezione Paesi usa solo capi con stato <strong>venduto</strong>, <strong>data vendita</strong> e paese compilato. Le colonne si aggiornano automaticamente.</div>
+      </div>
+      <div class="country-chips" id="countryChips"></div>
+      <div class="country-note">Ogni cella mostra solo i risultati di quel paese in quel giorno: <strong>fatturato</strong> · netto · pezzi venduti.</div>
+      <div class="table-wrap country-table">
+        <table>
+          <thead id="countriesHead"></thead>
+          <tbody id="countriesBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="aggiungi" class="tabpage hidden">
+    <div class="panel">
+      <div class="panel-head"><h2>Aggiungi capo / gruppo</h2><span>per sequenze tipo c50-1, c50-2 ... c50-40</span></div>
+      <div class="form">
+        <div class="field">
+          <label>Modalità</label>
+          <select id="mode"><option value="singolo">Singolo capo</option><option value="gruppo">Gruppo / sequenza</option></select>
+        </div>
+        <div class="field singleOnly">
+          <label>SKU singolo</label>
+          <input id="skuSingolo" placeholder="es. c50-1">
+        </div>
+        <div class="field groupOnly hidden">
+          <label>Gruppo / prefisso</label>
+          <input id="gruppoPrefix" placeholder="es. c50">
+        </div>
+        <div class="field groupOnly hidden">
+          <label>Dal numero</label>
+          <input id="seqStart" type="number" value="1" min="1">
+        </div>
+        <div class="field groupOnly hidden">
+          <label>Al numero</label>
+          <input id="seqEnd" type="number" value="40" min="1">
+        </div>
+        <div class="field">
+          <label>Bale</label>
+          <input id="newBale" placeholder="es. Bale 2, c50, acquisto aprile...">
+          <div class="help">Se lasci vuoto, userà il gruppo come nome bale.</div>
+        </div>
+        <div class="field">
+          <label>Stato</label>
+          <select id="newStato"><option>disponibile</option><option>venduto</option></select>
+        </div>
+        <div class="field">
+          <label>Costo per capo</label>
+          <input id="newCosto" type="number" step="0.01" placeholder="es. 5.50">
+        </div>
+        <div class="field">
+          <label>Prezzo vendita</label>
+          <input id="newVendita" type="number" step="0.01" placeholder="solo se venduto">
+        </div>
+        <div class="field">
+          <label>Data acquisto</label>
+          <input id="newDataAcquisto" type="date">
+        </div>
+        <div class="field saleOnly hidden">
+          <label>Data vendita</label>
+          <input id="newDataVendita" type="date">
+        </div>
+        <div class="field">
+          <label>Paese</label>
+          <input id="newPaese" placeholder="Italia, Francia...">
+        </div>
+        <div class="field">
+          <label>Pagamento pendente</label>
+          <select id="newPend"><option>NO</option><option>SI</option></select>
+        </div>
+        <div class="field full">
+          <label>Note</label>
+          <textarea id="newNote" placeholder="brand, difetti, posizione fisica, dettagli utili..."></textarea>
+        </div>
+        <div class="field full">
+          <button id="addBtn">Carica nel gestionale</button>
+          <div class="help" id="previewAdd">Modalità singola: verrà creato 1 prodotto.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="dashboard" class="tabpage">
+    <div class="panel">
+      <div class="panel-head"><h2>Dashboard vendite</h2><span>seleziona anno e mese: vedi fatturato, guadagno netto e pezzi venduti giorno per giorno</span></div>
+      <div class="dashboard-controls">
+        <div class="field"><label>Anno</label><select id="dashYear"></select></div>
+        <div class="field"><label>Mese</label><select id="dashMonth"></select></div>
+        <div class="field"><label>Visuale</label><select id="dashView"><option value="lista">Lista giorni</option><option value="calendario">Calendario</option></select></div>
+        <div class="help">La dashboard usa solo i capi con stato <strong>venduto</strong> e <strong>data vendita</strong> compilata.</div>
+      </div>
+      <div class="dashboard-summary">
+        <div class="metric"><span class="label">Fatturato mese</span><strong class="green" id="dashFat">€0,00</strong></div>
+        <div class="metric"><span class="label">Guadagno netto mese</span><strong id="dashNet">€0,00</strong></div>
+        <div class="metric"><span class="label">Pezzi venduti mese</span><strong id="dashPieces">0</strong></div>
+      </div>
+      <div id="dashListWrap" class="table-wrap">
+        <table>
+          <thead><tr><th>Giorno</th><th class="num">Fatturato</th><th class="num">Guadagno netto</th><th class="num">Pezzi venduti</th></tr></thead>
+          <tbody id="dashBody"></tbody>
+        </table>
+      </div>
+      <div id="dashCalendarWrap" class="hidden">
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const initialProducts = [{"id": 1, "sku": "tp2-1", "gruppo": "tp2", "stato": "disponibile", "costo": 2.75, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp2"}, {"id": 2, "sku": "tp2-2", "gruppo": "tp2", "stato": "disponibile", "costo": 2.75, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp2"}, {"id": 3, "sku": "tp2-3", "gruppo": "tp2", "stato": "disponibile", "costo": 2.75, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp2"}, {"id": 4, "sku": "tp2-4", "gruppo": "tp2", "stato": "disponibile", "costo": 2.75, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp2"}, {"id": 5, "sku": "tp2-5", "gruppo": "tp2", "stato": "disponibile", "costo": 2.75, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp2"}, {"id": 6, "sku": "tp2-6", "gruppo": "tp2", "stato": "disponibile", "costo": 2.75, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp2"}, {"id": 7, "sku": "tp2-7", "gruppo": "tp2", "stato": "disponibile", "costo": 2.75, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp2"}, {"id": 8, "sku": "tp2-8", "gruppo": "tp2", "stato": "disponibile", "costo": 2.75, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp2"}, {"id": 9, "sku": "tp2-9", "gruppo": "tp2", "stato": "disponibile", "costo": 2.75, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp2"}, {"id": 10, "sku": "nylon-1", "gruppo": "nylon", "stato": "disponibile", "costo": 8.54, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nylon"}, {"id": 11, "sku": "nylon-2", "gruppo": "nylon", "stato": "disponibile", "costo": 8.54, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nylon"}, {"id": 12, "sku": "nylon-3", "gruppo": "nylon", "stato": "disponibile", "costo": 8.54, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nylon"}, {"id": 13, "sku": "nylon-4", "gruppo": "nylon", "stato": "disponibile", "costo": 8.54, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nylon"}, {"id": 14, "sku": "nylon-5", "gruppo": "nylon", "stato": "disponibile", "costo": 8.54, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nylon"}, {"id": 15, "sku": "tp-1", "gruppo": "tp", "stato": "disponibile", "costo": 7.93, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp"}, {"id": 16, "sku": "tp-2", "gruppo": "tp", "stato": "disponibile", "costo": 7.93, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp"}, {"id": 17, "sku": "tp-3", "gruppo": "tp", "stato": "disponibile", "costo": 7.93, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp"}, {"id": 18, "sku": "tp-4", "gruppo": "tp", "stato": "disponibile", "costo": 7.93, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp"}, {"id": 19, "sku": "nikeh-1", "gruppo": "nikeh", "stato": "disponibile", "costo": 9.68, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh"}, {"id": 20, "sku": "lth-1", "gruppo": "lth", "stato": "disponibile", "costo": 36.6, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "lth"}, {"id": 21, "sku": "lth-2", "gruppo": "lth", "stato": "disponibile", "costo": 36.6, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "lth"}, {"id": 22, "sku": "lth-3", "gruppo": "lth", "stato": "disponibile", "costo": 36.6, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "lth"}, {"id": 23, "sku": "lth-4", "gruppo": "lth", "stato": "disponibile", "costo": 36.6, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "lth"}, {"id": 24, "sku": "lth1-1", "gruppo": "lth1", "stato": "disponibile", "costo": 11.85, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "lth1"}, {"id": 25, "sku": "lth1-2", "gruppo": "lth1", "stato": "disponibile", "costo": 11.85, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "lth1"}, {"id": 26, "sku": "lth1-3", "gruppo": "lth1", "stato": "disponibile", "costo": 11.85, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "lth1"}, {"id": 27, "sku": "mixfr-1", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 28, "sku": "mixfr-2", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 29, "sku": "mixfr-3", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 30, "sku": "mixfr-4", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 31, "sku": "mixfr-5", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 32, "sku": "mixfr-6", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 33, "sku": "mixfr-7", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 34, "sku": "mixfr-8", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 35, "sku": "mixfr-9", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 36, "sku": "mixfr-10", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 37, "sku": "mixfr-11", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 38, "sku": "mixfr-12", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 39, "sku": "mixfr-13", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 40, "sku": "mixfr-14", "gruppo": "mixfr", "stato": "disponibile", "costo": 3.4, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixfr"}, {"id": 41, "sku": "cdpants-1", "gruppo": "cdpants", "stato": "disponibile", "costo": 13.22, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "cdpants"}, {"id": 42, "sku": "cdpants-2", "gruppo": "cdpants", "stato": "disponibile", "costo": 13.22, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "cdpants"}, {"id": 43, "sku": "cdpants-3", "gruppo": "cdpants", "stato": "disponibile", "costo": 13.22, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "cdpants"}, {"id": 44, "sku": "cdpants-4", "gruppo": "cdpants", "stato": "disponibile", "costo": 13.22, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "cdpants"}, {"id": 45, "sku": "cdpants-5", "gruppo": "cdpants", "stato": "disponibile", "costo": 13.22, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "cdpants"}, {"id": 46, "sku": "w7-1", "gruppo": "w7", "stato": "disponibile", "costo": 5.65, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w7"}, {"id": 47, "sku": "w7-2", "gruppo": "w7", "stato": "disponibile", "costo": 5.65, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w7"}, {"id": 48, "sku": "w7-3", "gruppo": "w7", "stato": "disponibile", "costo": 5.65, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w7"}, {"id": 49, "sku": "w7-4", "gruppo": "w7", "stato": "disponibile", "costo": 5.65, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w7"}, {"id": 50, "sku": "w7-5", "gruppo": "w7", "stato": "disponibile", "costo": 5.65, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w7"}, {"id": 51, "sku": "jersey-1", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 52, "sku": "jersey-2", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 53, "sku": "jersey-3", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 54, "sku": "jersey-4", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 55, "sku": "jersey-5", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 56, "sku": "jersey-6", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 57, "sku": "jersey-7", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 58, "sku": "jersey-8", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 59, "sku": "jersey-9", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 60, "sku": "jersey-10", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 61, "sku": "jersey-11", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 62, "sku": "jersey-12", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 63, "sku": "jersey-13", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 64, "sku": "jersey-14", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 65, "sku": "jersey-15", "gruppo": "jersey", "stato": "disponibile", "costo": 6.62, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jersey"}, {"id": 66, "sku": "r1-1", "gruppo": "r1", "stato": "disponibile", "costo": 5.05, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "r1"}, {"id": 67, "sku": "vintage-1", "gruppo": "vintage", "stato": "disponibile", "costo": 13.3, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "vintage"}, {"id": 68, "sku": "vintage-2", "gruppo": "vintage", "stato": "disponibile", "costo": 13.3, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "vintage"}, {"id": 69, "sku": "vintage-3", "gruppo": "vintage", "stato": "disponibile", "costo": 13.3, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "vintage"}, {"id": 70, "sku": "tp3-1", "gruppo": "tp3", "stato": "disponibile", "costo": 10.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp3"}, {"id": 71, "sku": "tp3-2", "gruppo": "tp3", "stato": "disponibile", "costo": 10.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tp3"}, {"id": 72, "sku": "carpj-1", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 73, "sku": "carpj-2", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 74, "sku": "carpj-3", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 75, "sku": "carpj-4", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 76, "sku": "carpj-5", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 77, "sku": "carpj-6", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 78, "sku": "carpj-7", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 79, "sku": "carpj-8", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 80, "sku": "carpj-9", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 81, "sku": "carpj-10", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 82, "sku": "carpj-11", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 83, "sku": "carpj-12", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 84, "sku": "carpj-13", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 85, "sku": "carpj-14", "gruppo": "carpj", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "carpj"}, {"id": 86, "sku": "m2-1", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 87, "sku": "m2-2", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 88, "sku": "m2-3", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 89, "sku": "m2-4", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 90, "sku": "m2-5", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 91, "sku": "m2-6", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 92, "sku": "m2-7", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 93, "sku": "m2-8", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 94, "sku": "m2-9", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 95, "sku": "m2-10", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 96, "sku": "m2-11", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 97, "sku": "m2-12", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 98, "sku": "m2-13", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 99, "sku": "m2-14", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 100, "sku": "m2-15", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 101, "sku": "m2-16", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 102, "sku": "m2-17", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 103, "sku": "m2-18", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 104, "sku": "m2-19", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 105, "sku": "m2-20", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 106, "sku": "m2-21", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 107, "sku": "m2-22", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 108, "sku": "m2-23", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 109, "sku": "m2-24", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 110, "sku": "m2-25", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 111, "sku": "m2-26", "gruppo": "m2", "stato": "disponibile", "costo": 9.69, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m2"}, {"id": 112, "sku": "cj-1", "gruppo": "cj", "stato": "disponibile", "costo": 7.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "cj"}, {"id": 113, "sku": "cj-2", "gruppo": "cj", "stato": "disponibile", "costo": 7.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "cj"}, {"id": 114, "sku": "cj-3", "gruppo": "cj", "stato": "disponibile", "costo": 7.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "cj"}, {"id": 115, "sku": "cj-4", "gruppo": "cj", "stato": "disponibile", "costo": 7.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "cj"}, {"id": 116, "sku": "levis1-1", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 117, "sku": "levis1-2", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 118, "sku": "levis1-3", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 119, "sku": "levis1-4", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 120, "sku": "levis1-5", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 121, "sku": "levis1-6", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 122, "sku": "levis1-7", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 123, "sku": "levis1-8", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 124, "sku": "levis1-9", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 125, "sku": "levis1-10", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 126, "sku": "levis1-11", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 127, "sku": "levis1-12", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 128, "sku": "levis1-13", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 129, "sku": "levis1-14", "gruppo": "levis1", "stato": "disponibile", "costo": 6.25, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis1"}, {"id": 130, "sku": "mss2-1", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 131, "sku": "mss2-2", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 132, "sku": "mss2-3", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 133, "sku": "mss2-4", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 134, "sku": "mss2-5", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 135, "sku": "mss2-6", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 136, "sku": "mss2-7", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 137, "sku": "mss2-8", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 138, "sku": "mss2-9", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 139, "sku": "mss2-10", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 140, "sku": "mss2-11", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 141, "sku": "mss2-12", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 142, "sku": "mss2-13", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 143, "sku": "mss2-14", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 144, "sku": "mss2-15", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 145, "sku": "mss2-16", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 146, "sku": "mss2-17", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 147, "sku": "mss2-18", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 148, "sku": "mss2-19", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 149, "sku": "mss2-20", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 150, "sku": "mss2-21", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 151, "sku": "mss2-22", "gruppo": "mss2", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss2"}, {"id": 152, "sku": "tree-1", "gruppo": "tree", "stato": "disponibile", "costo": 25.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tree"}, {"id": 153, "sku": "tree-2", "gruppo": "tree", "stato": "disponibile", "costo": 25.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tree"}, {"id": 154, "sku": "tree-3", "gruppo": "tree", "stato": "disponibile", "costo": 25.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tree"}, {"id": 155, "sku": "tree-4", "gruppo": "tree", "stato": "disponibile", "costo": 25.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tree"}, {"id": 156, "sku": "tree-5", "gruppo": "tree", "stato": "disponibile", "costo": 25.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tree"}, {"id": 157, "sku": "w5-1", "gruppo": "w5", "stato": "disponibile", "costo": 2.1, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w5"}, {"id": 158, "sku": "w5-2", "gruppo": "w5", "stato": "disponibile", "costo": 2.1, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w5"}, {"id": 159, "sku": "w5-3", "gruppo": "w5", "stato": "disponibile", "costo": 2.1, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w5"}, {"id": 160, "sku": "w5-4", "gruppo": "w5", "stato": "disponibile", "costo": 2.1, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w5"}, {"id": 161, "sku": "w5-5", "gruppo": "w5", "stato": "disponibile", "costo": 2.1, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w5"}, {"id": 162, "sku": "w5-6", "gruppo": "w5", "stato": "disponibile", "costo": 2.1, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w5"}, {"id": 163, "sku": "w5-7", "gruppo": "w5", "stato": "disponibile", "costo": 2.1, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w5"}, {"id": 164, "sku": "w5-8", "gruppo": "w5", "stato": "disponibile", "costo": 2.1, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w5"}, {"id": 165, "sku": "w5-9", "gruppo": "w5", "stato": "disponibile", "costo": 2.1, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w5"}, {"id": 166, "sku": "w5-10", "gruppo": "w5", "stato": "disponibile", "costo": 2.1, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w5"}, {"id": 167, "sku": "tv-1", "gruppo": "tv", "stato": "disponibile", "costo": 10.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tv"}, {"id": 168, "sku": "tnf1-1", "gruppo": "tnf1", "stato": "disponibile", "costo": 9.85, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "tnf1"}, {"id": 169, "sku": "fblu-1", "gruppo": "fblu", "stato": "disponibile", "costo": 20.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "fblu"}, {"id": 170, "sku": "levis-1", "gruppo": "levis", "stato": "disponibile", "costo": 9.63, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "levis"}, {"id": 171, "sku": "mixj2-1", "gruppo": "mixj2", "stato": "disponibile", "costo": 14.45, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj2"}, {"id": 172, "sku": "mixj2-2", "gruppo": "mixj2", "stato": "disponibile", "costo": 14.45, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj2"}, {"id": 173, "sku": "car1-1", "gruppo": "car1", "stato": "disponibile", "costo": 9.92, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car1"}, {"id": 174, "sku": "car2-1", "gruppo": "car2", "stato": "disponibile", "costo": 13.23, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car2"}, {"id": 175, "sku": "car2-2", "gruppo": "car2", "stato": "disponibile", "costo": 13.23, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car2"}, {"id": 176, "sku": "car2-3", "gruppo": "car2", "stato": "disponibile", "costo": 13.23, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car2"}, {"id": 177, "sku": "car2-4", "gruppo": "car2", "stato": "disponibile", "costo": 13.23, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car2"}, {"id": 178, "sku": "car2-5", "gruppo": "car2", "stato": "disponibile", "costo": 13.23, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car2"}, {"id": 179, "sku": "mss-1", "gruppo": "mss", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss"}, {"id": 180, "sku": "mss-2", "gruppo": "mss", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss"}, {"id": 181, "sku": "mss-3", "gruppo": "mss", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss"}, {"id": 182, "sku": "mss-4", "gruppo": "mss", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss"}, {"id": 183, "sku": "mss-5", "gruppo": "mss", "stato": "disponibile", "costo": 12.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mss"}, {"id": 184, "sku": "w2-1", "gruppo": "w2", "stato": "disponibile", "costo": 2.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w2"}, {"id": 185, "sku": "w2-2", "gruppo": "w2", "stato": "disponibile", "costo": 2.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w2"}, {"id": 186, "sku": "w2-3", "gruppo": "w2", "stato": "disponibile", "costo": 2.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w2"}, {"id": 187, "sku": "w2-4", "gruppo": "w2", "stato": "disponibile", "costo": 2.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w2"}, {"id": 188, "sku": "w2-5", "gruppo": "w2", "stato": "disponibile", "costo": 2.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w2"}, {"id": 189, "sku": "w2-6", "gruppo": "w2", "stato": "disponibile", "costo": 2.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w2"}, {"id": 190, "sku": "w2-7", "gruppo": "w2", "stato": "disponibile", "costo": 2.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w2"}, {"id": 191, "sku": "w2-8", "gruppo": "w2", "stato": "disponibile", "costo": 2.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w2"}, {"id": 192, "sku": "w2-9", "gruppo": "w2", "stato": "disponibile", "costo": 2.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w2"}, {"id": 193, "sku": "w2-10", "gruppo": "w2", "stato": "disponibile", "costo": 2.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w2"}, {"id": 194, "sku": "w2-11", "gruppo": "w2", "stato": "disponibile", "costo": 2.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w2"}, {"id": 195, "sku": "w2-12", "gruppo": "w2", "stato": "disponibile", "costo": 2.66, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w2"}, {"id": 196, "sku": "w3-1", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 197, "sku": "w3-2", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 198, "sku": "w3-3", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 199, "sku": "w3-4", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 200, "sku": "w3-5", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 201, "sku": "w3-6", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 202, "sku": "w3-7", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 203, "sku": "w3-8", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 204, "sku": "w3-9", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 205, "sku": "w3-10", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 206, "sku": "w3-11", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 207, "sku": "w3-12", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 208, "sku": "w3-13", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 209, "sku": "w3-14", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 210, "sku": "w3-15", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 211, "sku": "w3-16", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 212, "sku": "w3-17", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 213, "sku": "w3-18", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 214, "sku": "w3-19", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 215, "sku": "w3-20", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 216, "sku": "w3-21", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 217, "sku": "w3-22", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 218, "sku": "w3-23", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 219, "sku": "w3-24", "gruppo": "w3", "stato": "disponibile", "costo": 3.31, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w3"}, {"id": 220, "sku": "m1-1", "gruppo": "m1", "stato": "disponibile", "costo": 6.6, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m1"}, {"id": 221, "sku": "m1-2", "gruppo": "m1", "stato": "disponibile", "costo": 6.6, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m1"}, {"id": 222, "sku": "m1-3", "gruppo": "m1", "stato": "disponibile", "costo": 6.6, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m1"}, {"id": 223, "sku": "m1-4", "gruppo": "m1", "stato": "disponibile", "costo": 6.6, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m1"}, {"id": 224, "sku": "m1-5", "gruppo": "m1", "stato": "disponibile", "costo": 6.6, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m1"}, {"id": 225, "sku": "m1-6", "gruppo": "m1", "stato": "disponibile", "costo": 6.6, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m1"}, {"id": 226, "sku": "m1-7", "gruppo": "m1", "stato": "disponibile", "costo": 6.6, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "m1"}, {"id": 227, "sku": "y2k3-1", "gruppo": "y2k3", "stato": "disponibile", "costo": 4.57, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "y2k3"}, {"id": 228, "sku": "y2k3-2", "gruppo": "y2k3", "stato": "disponibile", "costo": 4.57, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "y2k3"}, {"id": 229, "sku": "y2k3-3", "gruppo": "y2k3", "stato": "disponibile", "costo": 4.57, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "y2k3"}, {"id": 230, "sku": "y2k3-4", "gruppo": "y2k3", "stato": "disponibile", "costo": 4.57, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "y2k3"}, {"id": 231, "sku": "y2k3-5", "gruppo": "y2k3", "stato": "disponibile", "costo": 4.57, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "y2k3"}, {"id": 232, "sku": "y2k3-6", "gruppo": "y2k3", "stato": "disponibile", "costo": 4.57, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "y2k3"}, {"id": 233, "sku": "y2k3-7", "gruppo": "y2k3", "stato": "disponibile", "costo": 4.57, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "y2k3"}, {"id": 234, "sku": "y2k3-8", "gruppo": "y2k3", "stato": "disponibile", "costo": 4.57, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "y2k3"}, {"id": 235, "sku": "y2k3-9", "gruppo": "y2k3", "stato": "disponibile", "costo": 4.57, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "y2k3"}, {"id": 236, "sku": "y2k3-10", "gruppo": "y2k3", "stato": "disponibile", "costo": 4.57, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "y2k3"}, {"id": 237, "sku": "y2k3-11", "gruppo": "y2k3", "stato": "disponibile", "costo": 4.57, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "y2k3"}, {"id": 238, "sku": "y2k3-12", "gruppo": "y2k3", "stato": "disponibile", "costo": 4.57, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "y2k3"}, {"id": 239, "sku": "mixj-1", "gruppo": "mixj", "stato": "disponibile", "costo": 7.32, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj"}, {"id": 240, "sku": "mixj-2", "gruppo": "mixj", "stato": "disponibile", "costo": 7.32, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj"}, {"id": 241, "sku": "mixj-3", "gruppo": "mixj", "stato": "disponibile", "costo": 7.32, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj"}, {"id": 242, "sku": "mixj-4", "gruppo": "mixj", "stato": "disponibile", "costo": 7.32, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj"}, {"id": 243, "sku": "mixj-5", "gruppo": "mixj", "stato": "disponibile", "costo": 7.32, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj"}, {"id": 244, "sku": "mixj-6", "gruppo": "mixj", "stato": "disponibile", "costo": 7.32, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj"}, {"id": 245, "sku": "mixj-7", "gruppo": "mixj", "stato": "disponibile", "costo": 7.32, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj"}, {"id": 246, "sku": "mixj-8", "gruppo": "mixj", "stato": "disponibile", "costo": 7.32, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj"}, {"id": 247, "sku": "mixj-9", "gruppo": "mixj", "stato": "disponibile", "costo": 7.32, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj"}, {"id": 248, "sku": "mixj-10", "gruppo": "mixj", "stato": "disponibile", "costo": 7.32, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj"}, {"id": 249, "sku": "mixj-11", "gruppo": "mixj", "stato": "disponibile", "costo": 7.32, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj"}, {"id": 250, "sku": "mixj-12", "gruppo": "mixj", "stato": "disponibile", "costo": 7.32, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "mixj"}, {"id": 251, "sku": "fish-1", "gruppo": "fish", "stato": "disponibile", "costo": 5.65, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "fish"}, {"id": 252, "sku": "fish-2", "gruppo": "fish", "stato": "disponibile", "costo": 5.65, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "fish"}, {"id": 253, "sku": "fish-3", "gruppo": "fish", "stato": "disponibile", "costo": 5.65, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "fish"}, {"id": 254, "sku": "fish-4", "gruppo": "fish", "stato": "disponibile", "costo": 5.65, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "fish"}, {"id": 255, "sku": "fish-5", "gruppo": "fish", "stato": "disponibile", "costo": 5.65, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "fish"}, {"id": 256, "sku": "nikeh1-1", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 257, "sku": "nikeh1-2", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 258, "sku": "nikeh1-3", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 259, "sku": "nikeh1-4", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 260, "sku": "nikeh1-5", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 261, "sku": "nikeh1-6", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 262, "sku": "nikeh1-7", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 263, "sku": "nikeh1-8", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 264, "sku": "nikeh1-9", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 265, "sku": "nikeh1-10", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 266, "sku": "nikeh1-11", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 267, "sku": "nikeh1-12", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 268, "sku": "nikeh1-13", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 269, "sku": "nikeh1-14", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 270, "sku": "nikeh1-15", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 271, "sku": "nikeh1-16", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 272, "sku": "nikeh1-17", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 273, "sku": "nikeh1-18", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 274, "sku": "nikeh1-19", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 275, "sku": "nikeh1-20", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 276, "sku": "nikeh1-21", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 277, "sku": "nikeh1-22", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 278, "sku": "nikeh1-23", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 279, "sku": "nikeh1-24", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 280, "sku": "nikeh1-25", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 281, "sku": "nikeh1-26", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 282, "sku": "nikeh1-27", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 283, "sku": "nikeh1-28", "gruppo": "nikeh1", "stato": "disponibile", "costo": 9.56, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "nikeh1"}, {"id": 284, "sku": "w6-1", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 285, "sku": "w6-2", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 286, "sku": "w6-3", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 287, "sku": "w6-4", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 288, "sku": "w6-5", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 289, "sku": "w6-6", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 290, "sku": "w6-7", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 291, "sku": "w6-8", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 292, "sku": "w6-9", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 293, "sku": "w6-10", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 294, "sku": "w6-11", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 295, "sku": "w6-12", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 296, "sku": "w6-13", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 297, "sku": "w6-14", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 298, "sku": "w6-15", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 299, "sku": "w6-16", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 300, "sku": "w6-17", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 301, "sku": "w6-18", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 302, "sku": "w6-19", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 303, "sku": "w6-20", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 304, "sku": "w6-21", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 305, "sku": "w6-22", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 306, "sku": "w6-23", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 307, "sku": "w6-24", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 308, "sku": "w6-25", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 309, "sku": "w6-26", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 310, "sku": "w6-27", "gruppo": "w6", "stato": "disponibile", "costo": 4.97, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "w6"}, {"id": 311, "sku": "car8-1", "gruppo": "car8", "stato": "disponibile", "costo": 15.67, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car8"}, {"id": 312, "sku": "car8-2", "gruppo": "car8", "stato": "disponibile", "costo": 15.67, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car8"}, {"id": 313, "sku": "car8-3", "gruppo": "car8", "stato": "disponibile", "costo": 15.67, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car8"}, {"id": 314, "sku": "car8-4", "gruppo": "car8", "stato": "disponibile", "costo": 15.67, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car8"}, {"id": 315, "sku": "car8-5", "gruppo": "car8", "stato": "disponibile", "costo": 15.67, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car8"}, {"id": 316, "sku": "car8-6", "gruppo": "car8", "stato": "disponibile", "costo": 15.67, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car8"}, {"id": 317, "sku": "car8-7", "gruppo": "car8", "stato": "disponibile", "costo": 15.67, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car8"}, {"id": 318, "sku": "car8-8", "gruppo": "car8", "stato": "disponibile", "costo": 15.67, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car8"}, {"id": 319, "sku": "car8-9", "gruppo": "car8", "stato": "disponibile", "costo": 15.67, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car8"}, {"id": 320, "sku": "car8-10", "gruppo": "car8", "stato": "disponibile", "costo": 15.67, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car8"}, {"id": 321, "sku": "car8-11", "gruppo": "car8", "stato": "disponibile", "costo": 15.67, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car8"}, {"id": 322, "sku": "car6-1", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 323, "sku": "car6-2", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 324, "sku": "car6-3", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 325, "sku": "car6-4", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 326, "sku": "car6-5", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 327, "sku": "car6-6", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 328, "sku": "car6-7", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 329, "sku": "car6-8", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 330, "sku": "car6-9", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 331, "sku": "car6-10", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 332, "sku": "car6-11", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 333, "sku": "car6-12", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 334, "sku": "car6-13", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 335, "sku": "car6-14", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 336, "sku": "car6-15", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 337, "sku": "car6-16", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 338, "sku": "car6-17", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 339, "sku": "car6-18", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 340, "sku": "car6-19", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 341, "sku": "car6-20", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 342, "sku": "car6-21", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 343, "sku": "car6-22", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 344, "sku": "car6-23", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 345, "sku": "car6-24", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 346, "sku": "car6-25", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 347, "sku": "car6-26", "gruppo": "car6", "stato": "disponibile", "costo": 10.73, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "car6"}, {"id": 348, "sku": "jack-1", "gruppo": "jack", "stato": "disponibile", "costo": 5.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jack"}, {"id": 349, "sku": "jack-2", "gruppo": "jack", "stato": "disponibile", "costo": 5.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jack"}, {"id": 350, "sku": "jack-3", "gruppo": "jack", "stato": "disponibile", "costo": 5.0, "vendita": 0.0, "dataAcquisto": "2026-04-24", "dataVendita": "", "pagamentoPendente": "NO", "zona": "", "paese": "", "piattaforma": "Vinted", "note": "", "bale": "jack"}];
+const KEY='origo_gestionale_v6_sheets';
+const SHEET_URL_KEY='origo_google_sheet_webapp_url';
+
+let products=loadProducts();
+
+function loadProducts(){
+  try{
+    const saved=localStorage.getItem(KEY);
+    if(saved) return JSON.parse(saved);
+  }catch(e){}
+  return structuredClone(initialProducts);
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(products)); }
+function money(n){ return (Number(n)||0).toLocaleString('it-IT',{style:'currency',currency:'EUR'}); }
+function esc(v){ return String(v ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function parseNum(v){ return Number(String(v ?? '').replace(',','.')) || 0; }
+function isSold(p){ return String(p.stato || '').toLowerCase() === 'venduto'; }
+function groupFromSku(sku){ const m=String(sku||'').match(/^(.*)-(\d+)$/); return m ? m[1] : ''; }
+function today(){ return new Date().toISOString().slice(0,10); }
+
+function normalizeProduct(p){
+  p.stato = isSold(p) ? 'venduto' : 'disponibile';
+  p.gruppo = p.gruppo || groupFromSku(p.sku);
+  p.bale = p.bale || p.gruppo || 'Senza bale';
+  p.costo = parseNum(p.costo);
+  p.vendita = parseNum(p.vendita);
+  if(!isSold(p)) p.dataVendita = '';
+  return p;
+}
+
+function getBaleRows(){
+  const map=new Map();
+  products.forEach(p=>{
+    normalizeProduct(p);
+    const b=p.bale || 'Senza bale';
+    if(!map.has(b)) map.set(b,{pezzi:0,disp:0,vend:0,costoTot:0,fat:0,costoVend:0,groups:new Map()});
+    const r=map.get(b);
+    r.pezzi++; r.costoTot += p.costo || 0;
+    r.groups.set(p.gruppo || 'Senza gruppo',(r.groups.get(p.gruppo || 'Senza gruppo')||0)+1);
+    if(isSold(p)){ r.vend++; r.fat += p.vendita || 0; r.costoVend += p.costo || 0; }
+    else r.disp++;
+  });
+  return [...map.entries()].map(([b,r])=>{
+    r.name=b;
+    r.completion = r.pezzi ? (r.vend/r.pezzi)*100 : 0;
+    r.netEffettivo = r.fat - r.costoVend;
+    r.manca = Math.max(r.costoTot-r.fat,0);
+    r.roiEffettivo = r.costoVend ? (r.netEffettivo / r.costoVend) * 100 : 0;
+    r.mainGroups = [...r.groups.entries()].sort((a,b)=>b[1]-a[1]).slice(0,4).map(x=>x[0]).join(', ');
+    return r;
+  }).sort((a,b)=>a.name.localeCompare(b.name,'it',{numeric:true}));
+}
+
+function filteredProducts(){
+  const q=document.getElementById('search').value.trim().toLowerCase();
+  const stato=document.getElementById('filterStato').value;
+  const bale=document.getElementById('filterBale').value;
+  const gruppo=document.getElementById('filterGruppo').value;
+  const sort=document.getElementById('sortBy').value;
+  let rows=products.filter(p=>{
+    const hay=[p.sku,p.bale,p.gruppo,p.paese,p.note,p.stato].join(' ').toLowerCase();
+    return (!q || hay.includes(q)) && (!stato || p.stato===stato) && (!bale || p.bale===bale) && (!gruppo || p.gruppo===gruppo);
+  });
+  rows.sort((a,b)=>{
+    if(sort==='costo_desc') return (b.costo||0)-(a.costo||0);
+    if(sort==='vendita_desc') return (b.vendita||0)-(a.vendita||0);
+    if(sort==='bale') return String(a.bale).localeCompare(String(b.bale),'it',{numeric:true}) || String(a.sku).localeCompare(String(b.sku),'it',{numeric:true});
+    if(sort==='gruppo') return String(a.gruppo).localeCompare(String(b.gruppo),'it',{numeric:true}) || String(a.sku).localeCompare(String(b.sku),'it',{numeric:true});
+    return String(a.sku).localeCompare(String(b.sku),'it',{numeric:true});
+  });
+  return rows;
+}
+
+function render(){
+  products.forEach(normalizeProduct);
+  renderFilters();
+  renderKpis();
+  renderTable();
+  renderBales();
+  renderDashboard();
+  renderCountries();
+  updateFormVisibility();
+}
+
+function renderKpis(){
+  const tot=products.length;
+  const disp=products.filter(p=>!isSold(p)).length;
+  const inv=products.filter(p=>!isSold(p)).reduce((s,p)=>s+p.costo,0);
+  const fat=products.filter(isSold).reduce((s,p)=>s+p.vendita,0);
+  const costoVend=products.filter(isSold).reduce((s,p)=>s+p.costo,0);
+  const net=fat-costoVend;
+  document.getElementById('kpiTot').textContent=tot;
+  document.getElementById('kpiDisp').textContent=disp;
+  document.getElementById('kpiBale').textContent=getBaleRows().length;
+  document.getElementById('kpiInv').textContent=money(inv);
+  document.getElementById('kpiFat').textContent=money(fat);
+  document.getElementById('kpiNet').textContent=money(net);
+  document.getElementById('kpiNet').className='value '+(net>=0?'green':'red');
+}
+
+function renderFilters(){
+  const fg=document.getElementById('filterGruppo'), fb=document.getElementById('filterBale');
+  const oldG=fg.value, oldB=fb.value;
+  const groups=[...new Set(products.map(p=>p.gruppo).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it',{numeric:true}));
+  const bales=[...new Set(products.map(p=>p.bale).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it',{numeric:true}));
+  fg.innerHTML='<option value="">Tutti i gruppi</option>'+groups.map(g=>`<option ${g===oldG?'selected':''}>${esc(g)}</option>`).join('');
+  fb.innerHTML='<option value="">Tutte le bale</option>'+bales.map(b=>`<option ${b===oldB?'selected':''}>${esc(b)}</option>`).join('');
+}
+
+function renderTable(){
+  const rows=filteredProducts();
+  document.getElementById('tbody').innerHTML=rows.map(p=>{
+    const idx=products.indexOf(p);
+    const gain=isSold(p) ? (p.vendita-p.costo) : 0;
+    return `<tr data-idx="${idx}">
+      <td class="sku"><input data-field="sku" value="${esc(p.sku)}"></td>
+      <td><input data-field="bale" value="${esc(p.bale)}"></td>
+      <td><input data-field="gruppo" value="${esc(p.gruppo)}"></td>
+      <td><select data-field="stato"><option ${p.stato==='disponibile'?'selected':''}>disponibile</option><option ${p.stato==='venduto'?'selected':''}>venduto</option></select></td>
+      <td class="num"><input data-field="costo" type="number" step="0.01" value="${p.costo}"></td>
+      <td class="num"><input data-field="vendita" type="number" step="0.01" value="${p.vendita}"></td>
+      <td class="num ${gain>=0?'green':'red'}">${isSold(p)?money(gain):'—'}</td>
+      <td><input data-field="dataAcquisto" type="date" value="${esc(p.dataAcquisto)}"></td>
+      <td><input data-field="dataVendita" type="date" value="${esc(p.dataVendita)}" ${!isSold(p)?'disabled':''}></td>
+      <td><input data-field="paese" value="${esc(p.paese)}"></td>
+      <td><select data-field="pagamentoPendente"><option ${p.pagamentoPendente==='NO'?'selected':''}>NO</option><option ${p.pagamentoPendente==='SI'?'selected':''}>SI</option></select></td>
+      <td><input data-field="note" value="${esc(p.note)}"></td>
+      <td><button class="small danger" data-delete="${idx}">Elimina</button></td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="13" class="empty">Nessun prodotto trovato.</td></tr>`;
+}
+
+function renderBales(){
+  const rows=getBaleRows();
+  document.getElementById('baleCards').innerHTML=rows.map(r=>`
+    <div class="bale-card">
+      <div class="bale-title"><div><h3>${esc(r.name)}</h3><div class="mini">${esc(r.mainGroups || 'nessun gruppo')}</div></div><button class="small secondary" data-view-bale="${esc(r.name)}">Vedi</button></div>
+      <div class="progress"><div style="width:${Math.min(100,r.completion).toFixed(1)}%"></div></div>
+      <div class="progressLabel">${r.vend}/${r.pezzi} venduti · ${r.completion.toFixed(1)}%</div>
+      <div class="bale-metrics">
+        <div class="metric"><span class="label">Costo totale</span><strong>${money(r.costoTot)}</strong></div>
+        <div class="metric"><span class="label">Fatturato venduto</span><strong class="green">${money(r.fat)}</strong></div>
+        <div class="metric"><span class="label">Guadagno effettivo</span><strong class="${r.netEffettivo>=0?'green':'red'}">${money(r.netEffettivo)}</strong></div>
+        <div class="metric"><span class="label">Manca a ripagare</span><strong class="${r.manca===0?'green':'amber'}">${money(r.manca)}</strong></div>
+        <div class="metric"><span class="label">ROI effettivo</span><strong class="${r.roiEffettivo>=0?'green':'red'}">${r.costoVend ? r.roiEffettivo.toFixed(1)+'%' : '—'}</strong></div>
+      </div>
+    </div>`).join('') || '<div class="empty">Nessuna bale presente.</div>';
+
+  document.getElementById('baleBody').innerHTML=rows.map(r=>`
+    <tr>
+      <td class="sku">${esc(r.name)}<div class="mini">${esc(r.mainGroups)}</div></td>
+      <td class="num">${r.pezzi}</td><td class="num">${r.vend}</td>
+      <td><div class="progress"><div style="width:${Math.min(100,r.completion).toFixed(1)}%"></div></div><div class="progressLabel">${r.completion.toFixed(1)}%</div></td>
+      <td class="num">${money(r.costoTot)}</td>
+      <td class="num green">${money(r.fat)}</td>
+      <td class="num ${r.netEffettivo>=0?'green':'red'}">${money(r.netEffettivo)}</td>
+      <td class="num ${r.manca===0?'green':'amber'}">${money(r.manca)}</td>
+      <td class="num ${r.roiEffettivo>=0?'green':'red'}">${r.costoVend ? r.roiEffettivo.toFixed(1)+'%' : '—'}</td>
+      <td><button class="small secondary" data-view-bale="${esc(r.name)}">Vedi inventario</button></td>
+    </tr>`).join('');
+}
+
+function monthName(m){ return new Date(2000, m-1, 1).toLocaleString('it-IT',{month:'long'}); }
+function dateKeyParts(key){ const [y,m,d]=String(key||'').split('-').map(Number); return {y,m,d}; }
+function soldProductsWithDate(){
+  return products.filter(p=>isSold(p) && /^\d{4}-\d{2}-\d{2}$/.test(String(p.dataVendita||'')));
+}
+function renderDashboardFilters(){
+  const yEl=document.getElementById('dashYear'), mEl=document.getElementById('dashMonth');
+  if(!yEl || !mEl) return;
+  const now=new Date();
+  const sold=soldProductsWithDate();
+  const years=[...new Set(sold.map(p=>dateKeyParts(p.dataVendita).y).filter(Boolean))];
+  years.push(now.getFullYear());
+  const uniqueYears=[...new Set(years)].sort((a,b)=>b-a);
+  const oldY=yEl.value || String(now.getFullYear());
+  const oldM=mEl.value || String(now.getMonth()+1).padStart(2,'0');
+  yEl.innerHTML=uniqueYears.map(y=>`<option value="${y}" ${String(y)===oldY?'selected':''}>${y}</option>`).join('');
+  if(!yEl.value && uniqueYears.length) yEl.value=String(uniqueYears[0]);
+  mEl.innerHTML=Array.from({length:12},(_,i)=>{
+    const v=String(i+1).padStart(2,'0');
+    return `<option value="${v}" ${v===oldM?'selected':''}>${monthName(i+1)}</option>`;
+  }).join('');
+}
+function getDashboardDays(){
+  const y=Number(document.getElementById('dashYear')?.value || new Date().getFullYear());
+  const m=Number(document.getElementById('dashMonth')?.value || (new Date().getMonth()+1));
+  const daysInMonth=new Date(y,m,0).getDate();
+  const rows=Array.from({length:daysInMonth},(_,i)=>({day:i+1,date:`${y}-${String(m).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`,fat:0,costo:0,pezzi:0}));
+  soldProductsWithDate().forEach(p=>{
+    const {y:py,m:pm,d}=dateKeyParts(p.dataVendita);
+    if(py===y && pm===m && rows[d-1]){
+      rows[d-1].fat += p.vendita || 0;
+      rows[d-1].costo += p.costo || 0;
+      rows[d-1].pezzi += 1;
+    }
+  });
+  rows.forEach(r=>r.net=r.fat-r.costo);
+  return {year:y,month:m,rows};
+}
+function renderDashboard(){
+  const dash=document.getElementById('dashboard');
+  if(!dash) return;
+  renderDashboardFilters();
+  const {year,month,rows}=getDashboardDays();
+  const fat=rows.reduce((s,r)=>s+r.fat,0);
+  const net=rows.reduce((s,r)=>s+r.net,0);
+  const pieces=rows.reduce((s,r)=>s+r.pezzi,0);
+  document.getElementById('dashFat').textContent=money(fat);
+  const netEl=document.getElementById('dashNet');
+  netEl.textContent=money(net); netEl.className=net>=0?'green':'red';
+  document.getElementById('dashPieces').textContent=pieces;
+  document.getElementById('dashBody').innerHTML=rows.map(r=>`
+    <tr>
+      <td class="sku">${String(r.day).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year}</td>
+      <td class="num green">${money(r.fat)}</td>
+      <td class="num ${r.net>=0?'green':'red'}">${money(r.net)}</td>
+      <td class="num">${r.pezzi}</td>
+    </tr>`).join('');
+  renderCalendar(year,month,rows);
+  const view=document.getElementById('dashView').value;
+  document.getElementById('dashListWrap').classList.toggle('hidden', view!=='lista');
+  document.getElementById('dashCalendarWrap').classList.toggle('hidden', view!=='calendario');
+}
+function renderCalendar(year,month,rows){
+  const grid=document.getElementById('calendarGrid'); if(!grid) return;
+  const names=['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
+  const first=new Date(year,month-1,1);
+  const offset=(first.getDay()+6)%7;
+  const cells=[];
+  names.forEach(n=>cells.push(`<div class="calendar-head">${n}</div>`));
+  for(let i=0;i<offset;i++) cells.push('<div class="calendar-day empty-day"></div>');
+  rows.forEach(r=>{
+    cells.push(`<div class="calendar-day">
+      <div class="calendar-date">${r.day} ${monthName(month)}</div>
+      <div class="calendar-net ${r.net>=0?'green':'red'}">${money(r.net)}</div>
+      <div class="calendar-meta">${r.pezzi} pezzi · fatt. ${money(r.fat)}</div>
+    </div>`);
+  });
+  grid.innerHTML=cells.join('');
+}
+
+function renderCountryFilters(){
+  const yEl=document.getElementById('countryYear'), mEl=document.getElementById('countryMonth');
+  if(!yEl || !mEl) return;
+  const now=new Date();
+  const sold=soldProductsWithDate();
+  const years=[...new Set(sold.map(p=>dateKeyParts(p.dataVendita).y).filter(Boolean))];
+  years.push(now.getFullYear());
+  const uniqueYears=[...new Set(years)].sort((a,b)=>b-a);
+  const oldY=yEl.value || String(now.getFullYear());
+  const oldM=mEl.value || String(now.getMonth()+1).padStart(2,'0');
+  yEl.innerHTML=uniqueYears.map(y=>`<option value="${y}" ${String(y)===oldY?'selected':''}>${y}</option>`).join('');
+  mEl.innerHTML=Array.from({length:12},(_,i)=>{
+    const v=String(i+1).padStart(2,'0');
+    return `<option value="${v}" ${v===oldM?'selected':''}>${monthName(i+1)}</option>`;
+  }).join('');
+}
+function getCountryDays(){
+  const y=Number(document.getElementById('countryYear')?.value || new Date().getFullYear());
+  const m=Number(document.getElementById('countryMonth')?.value || (new Date().getMonth()+1));
+  const daysInMonth=new Date(y,m,0).getDate();
+  const monthSold=soldProductsWithDate().filter(p=>{
+    const d=dateKeyParts(p.dataVendita);
+    return d.y===y && d.m===m;
+  });
+  const countries=[...new Set(monthSold.map(p=>(p.paese||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it',{numeric:true}));
+  const rows=Array.from({length:daysInMonth},(_,i)=>({day:i+1,date:`${y}-${String(m).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`,countries:{}}));
+  monthSold.forEach(p=>{
+    const country=(p.paese||'').trim();
+    if(!country) return;
+    const d=dateKeyParts(p.dataVendita).d;
+    const row=rows[d-1]; if(!row) return;
+    if(!row.countries[country]) row.countries[country]={fat:0,costo:0,pezzi:0,net:0};
+    row.countries[country].fat += p.vendita || 0;
+    row.countries[country].costo += p.costo || 0;
+    row.countries[country].pezzi += 1;
+  });
+  rows.forEach(r=>{
+    countries.forEach(c=>{ if(r.countries[c]) r.countries[c].net=r.countries[c].fat-r.countries[c].costo; });
+  });
+  const totals=countries.map(c=>{
+    const t=rows.reduce((acc,r)=>{
+      const v=r.countries[c];
+      if(v){ acc.fat+=v.fat; acc.costo+=v.costo; acc.pezzi+=v.pezzi; }
+      return acc;
+    },{country:c,fat:0,costo:0,pezzi:0,net:0});
+    t.net=t.fat-t.costo;
+    return t;
+  });
+  return {year:y,month:m,countries,rows,totals};
+}
+function renderCountries(){
+  const section=document.getElementById('paesi'); if(!section) return;
+  renderCountryFilters();
+  const {year,month,countries,rows,totals}=getCountryDays();
+  document.getElementById('countryChips').innerHTML = totals.length
+    ? totals.map(t=>`<div class="country-chip">${esc(t.country)} <strong class="green">${money(t.fat)}</strong> <span class="mini">· ${t.pezzi} pezzi</span></div>`).join('')
+    : '<div class="empty">Nessun paese trovato per questo mese. Aggiungi il paese in un capo venduto per creare la colonna.</div>';
+  const head=['<tr><th>Giorno</th>', ...countries.map(c=>`<th class="num">${esc(c)}</th>`), '</tr>'].join('');
+  document.getElementById('countriesHead').innerHTML=head;
+  document.getElementById('countriesBody').innerHTML=rows.map(r=>{
+    const cells=countries.map(c=>{
+      const v=r.countries[c];
+      if(!v) return '<td class="num">—</td>';
+      return `<td class="num country-cell"><strong class="green">${money(v.fat)}</strong><span class="${v.net>=0?'green':'red'}">netto ${money(v.net)}</span><span> · ${v.pezzi} pz</span></td>`;
+    }).join('');
+    return `<tr>
+      <td class="sku">${String(r.day).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year}</td>
+      ${cells}
+    </tr>`;
+  }).join('');
+}
+
+function updateFormVisibility
+(){
+  const mode=document.getElementById('mode').value;
+  document.querySelectorAll('.singleOnly').forEach(el=>el.classList.toggle('hidden', mode!=='singolo'));
+  document.querySelectorAll('.groupOnly').forEach(el=>el.classList.toggle('hidden', mode!=='gruppo'));
+  const sold=document.getElementById('newStato').value==='venduto';
+  document.querySelectorAll('.saleOnly').forEach(el=>el.classList.toggle('hidden', !sold));
+  if(!sold) document.getElementById('newDataVendita').value='';
+  const start=parseInt(document.getElementById('seqStart').value||'1',10);
+  const end=parseInt(document.getElementById('seqEnd').value||'1',10);
+  const count=mode==='gruppo' ? Math.max(0,end-start+1) : 1;
+  document.getElementById('previewAdd').textContent = mode==='gruppo'
+    ? `Modalità gruppo: verranno creati ${count} prodotti con stesso costo/prezzo/bale, poi modificabili singolarmente.`
+    : 'Modalità singola: verrà creato 1 prodotto.';
+}
+
+function addProducts(){
+  const mode=document.getElementById('mode').value;
+  const stato=document.getElementById('newStato').value;
+  const costo=parseNum(document.getElementById('newCosto').value);
+  const vendita=parseNum(document.getElementById('newVendita').value);
+  const dataAcquisto=document.getElementById('newDataAcquisto').value;
+  const dataVendita=stato==='venduto' ? document.getElementById('newDataVendita').value : '';
+  const zona='';
+  const paese=document.getElementById('newPaese').value.trim();
+  const pagamentoPendente=document.getElementById('newPend').value;
+  const note=document.getElementById('newNote').value.trim();
+  const nextId=()=> (products.reduce((m,p)=>Math.max(m,Number(p.id)||0),0)+1);
+  let toAdd=[];
+  if(mode==='singolo'){
+    const sku=document.getElementById('skuSingolo').value.trim();
+    if(!sku){ alert('Inserisci lo SKU.'); return; }
+    const gruppo=groupFromSku(sku);
+    const bale=(document.getElementById('newBale').value.trim() || gruppo || sku);
+    toAdd.push({id:nextId(),sku,gruppo,bale,stato,costo,vendita,dataAcquisto,dataVendita,zona,paese,pagamentoPendente,note,piattaforma:'Vinted'});
+  } else {
+    const prefix=document.getElementById('gruppoPrefix').value.trim();
+    const start=parseInt(document.getElementById('seqStart').value,10);
+    const end=parseInt(document.getElementById('seqEnd').value,10);
+    if(!prefix || !start || !end || end<start){ alert('Controlla gruppo, numero iniziale e finale.'); return; }
+    if(end-start+1>500 && !confirm('Stai per creare più di 500 prodotti. Continuare?')) return;
+    const bale=(document.getElementById('newBale').value.trim() || prefix);
+    let idBase=nextId();
+    for(let n=start;n<=end;n++) toAdd.push({id:idBase++,sku:`${prefix}-${n}`,gruppo:prefix,bale,stato,costo,vendita,dataAcquisto,dataVendita,zona,paese,pagamentoPendente,note,piattaforma:'Vinted'});
+  }
+  const existing=new Set(products.map(p=>p.sku));
+  const duplicates=toAdd.filter(p=>existing.has(p.sku));
+  if(duplicates.length && !confirm(`Ci sono ${duplicates.length} SKU già presenti. Vuoi inserirli comunque?`)) return;
+  products.push(...toAdd);
+  save(); render();
+  alert(`Caricati ${toAdd.length} prodotti.`);
+}
+
+function showTab(id){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+  document.querySelectorAll('.tabpage').forEach(p=>p.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>showTab(btn.dataset.tab)));
+
+document.getElementById('tbody').addEventListener('input', e=>{
+  const tr=e.target.closest('tr'); if(!tr) return;
+  const idx=Number(tr.dataset.idx); const field=e.target.dataset.field; if(!field) return;
+  const p=products[idx];
+  let val=e.target.value;
+  if(['costo','vendita'].includes(field)) val=parseNum(val);
+  p[field]=val;
+  if(field==='sku' && !p.gruppo) p.gruppo=groupFromSku(p.sku);
+  if(field==='gruppo' && !p.bale) p.bale=p.gruppo;
+  if(field==='stato' && val==='disponibile') p.dataVendita='';
+  save(); renderKpis(); renderBales(); renderDashboard(); renderCountries();
+});
+document.getElementById('tbody').addEventListener('change', e=>{
+  const tr=e.target.closest('tr'); if(!tr) return;
+  const idx=Number(tr.dataset.idx); const field=e.target.dataset.field; if(!field) return;
+  const p=products[idx];
+  if(field==='stato' && e.target.value==='venduto' && !p.dataVendita) p.dataVendita=today();
+  if(field==='sku' && !p.gruppo) p.gruppo=groupFromSku(p.sku);
+  if(field==='gruppo' && !p.bale) p.bale=p.gruppo;
+  save(); render();
+});
+document.getElementById('tbody').addEventListener('click', e=>{
+  const del=e.target.dataset.delete;
+  if(del!==undefined && confirm('Eliminare questo prodotto?')){ products.splice(Number(del),1); save(); render(); }
+});
+document.body.addEventListener('click', e=>{
+  const b=e.target.dataset.viewBale;
+  if(b){
+    document.getElementById('filterBale').value=b;
+    document.getElementById('search').value='';
+    showTab('inventario');
+    renderTable();
+  }
+});
+
+['search','filterStato','filterBale','filterGruppo','sortBy'].forEach(id=>document.getElementById(id).addEventListener('input', renderTable));
+['dashYear','dashMonth','dashView'].forEach(id=>document.getElementById(id).addEventListener('input', renderDashboard));
+['countryYear','countryMonth'].forEach(id=>document.getElementById(id).addEventListener('input', renderCountries));
+['mode','newStato','seqStart','seqEnd'].forEach(id=>document.getElementById(id).addEventListener('input', updateFormVisibility));
+document.getElementById('addBtn').addEventListener('click', addProducts);
+document.getElementById('newDataAcquisto').value=today();
+
+
+function setSyncStatus(msg,type=''){
+  const el=document.getElementById('syncStatus');
+  el.textContent=msg;
+  el.className='sync-status '+type;
+}
+function getSheetUrl(){ return (document.getElementById('sheetUrl').value || DEFAULT_SHEET_URL || '').trim(); }
+function productForSync(p){
+  const n=normalizeProduct({...p});
+  return {
+    id:n.id, sku:n.sku, bale:n.bale, gruppo:n.gruppo, stato:n.stato,
+    costo:n.costo, vendita:n.vendita, dataAcquisto:n.dataAcquisto, dataVendita:n.dataVendita,
+    zona:n.zona, paese:n.paese, pagamentoPendente:n.pagamentoPendente,
+    piattaforma:n.piattaforma || 'Vinted', note:n.note
+  };
+}
+function loadSheetUrl(){
+  const saved=localStorage.getItem(SHEET_URL_KEY) || '';
+  const value = (saved && saved.includes('/exec')) ? saved : DEFAULT_SHEET_URL;
+  document.getElementById('sheetUrl').value=value;
+  localStorage.setItem(SHEET_URL_KEY,value);
+}
+function saveSheetUrl(){
+  const url=getSheetUrl();
+  localStorage.setItem(SHEET_URL_KEY,url);
+  setSyncStatus(url ? 'URL salvato. Ora puoi importare/esportare manualmente.' : 'URL rimosso.', url ? 'ok' : '');
+}
+function importFromSheet(){
+  const url=getSheetUrl();
+  if(!url){ alert('Incolla prima l’URL della Web App Apps Script.'); return; }
+  const callback='origoImport_'+Date.now();
+  const script=document.createElement('script');
+  const sep=url.includes('?') ? '&' : '?';
+  window[callback]=(res)=>{
+    try{
+      if(!res || !res.ok) throw new Error(res && res.error ? res.error : 'Risposta non valida');
+      const incoming=(res.products||[]).map(normalizeProduct);
+      if(!incoming.length && !confirm('Il Google Sheet non contiene prodotti. Vuoi svuotare il gestionale locale?')) return;
+      products=incoming;
+      save(); render();
+      setSyncStatus(`Import completato: ${products.length} prodotti caricati da Google Sheet.`, 'ok');
+    }catch(err){ setSyncStatus('Errore import: '+err.message, 'err'); }
+    finally{ delete window[callback]; script.remove(); }
+  };
+  script.onerror=()=>{ setSyncStatus('Errore import: controlla URL Web App e permessi di accesso.', 'err'); delete window[callback]; script.remove(); };
+  setSyncStatus('Import da Google Sheet in corso...');
+  script.src=`${url}${sep}action=read&callback=${callback}&t=${Date.now()}`;
+  document.body.appendChild(script);
+}
+function exportToSheet(){
+  const url=getSheetUrl();
+  if(!url){ alert('Incolla prima l’URL della Web App Apps Script.'); return; }
+  if(!confirm(`Esportare ${products.length} prodotti nella tab ORIGO_GESTIONALE_SYNC del Google Sheet? Le altre schede non verranno toccate.`)) return;
+  const payload=JSON.stringify({source:'origo_html_v10_sheet_collegato', updatedAt:new Date().toISOString(), products:products.map(productForSync)});
+  const iframeName='origoSyncFrame';
+  let iframe=document.querySelector(`iframe[name="${iframeName}"]`);
+  if(!iframe){ iframe=document.createElement('iframe'); iframe.name=iframeName; iframe.style.display='none'; document.body.appendChild(iframe); }
+  const form=document.createElement('form');
+  form.method='POST'; form.action=url; form.target=iframeName; form.style.display='none';
+  const input=document.createElement('input'); input.type='hidden'; input.name='payload'; input.value=payload;
+  form.appendChild(input); document.body.appendChild(form);
+  form.submit(); form.remove();
+  setSyncStatus(`Export inviato: ${products.length} prodotti verso Google Sheet. Controlla la tab ORIGO_GESTIONALE_SYNC.`, 'ok');
+}
+document.getElementById('saveSheetUrlBtn').addEventListener('click', saveSheetUrl);
+document.getElementById('importSheetBtn').addEventListener('click', importFromSheet);
+document.getElementById('exportSheetBtn').addEventListener('click', exportToSheet);
+loadSheetUrl();
+
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const headers=['sku','bale','gruppo','stato','costo','vendita','guadagno_venduto','dataAcquisto','dataVendita','paese','pagamentoPendente','note'];
+  const lines=[headers.join(';')].concat(products.map(p=>headers.map(h=>{
+    let v=h==='guadagno_venduto' ? (isSold(p)?(p.vendita-p.costo):0) : (p[h]??'');
+    return `"${String(v).replaceAll('"','""')}"`;
+  }).join(';')));
+  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='origo_gestionale_export_bale.csv'; a.click();
+});
+
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  if(confirm('Vuoi tornare ai dati iniziali e cancellare le modifiche salvate nel browser?')){ localStorage.removeItem(KEY); products=structuredClone(initialProducts); render(); }
+});
+
+render();
+</script>
+</body>
+</html>
