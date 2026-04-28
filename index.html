@@ -684,20 +684,41 @@ function saveSheetUrl(){
 function importFromSheet(){
   const url=getSheetUrl();
   if(!url){ alert('Incolla prima l’URL della Web App Apps Script.'); return; }
-  const callback='origoImport_'+Date.now();
-  const script=document.createElement('script');
-  const sep=url.includes('?') ? '&' : '?';
-  window[callback]=(res)=>{
-    try{
-      if(!res || !res.ok) throw new Error(res && res.error ? res.error : 'Risposta non valida');
-      const incoming=(res.products||[]).map(normalizeProduct);
-      if(!incoming.length && !confirm('Il Google Sheet non contiene prodotti. Vuoi svuotare il gestionale locale?')) return;
-      products=incoming;
-      save(); render();
+
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      const headers = data[0];
+
+      products = data.slice(1).map(row => {
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = row[i]);
+
+        return normalizeProduct({
+          id: obj.id,
+          sku: obj.sku,
+          bale: obj.bale,
+          gruppo: obj.gruppo,
+          stato: obj.stato,
+          costo: obj.costo,
+          vendita: obj.vendita,
+          dataAcquisto: obj.dataAcquisto,
+          dataVendita: obj.dataVendita,
+          paese: obj.paese,
+          pagamentoPendente: obj.pagamentoPendente,
+          piattaforma: obj.piattaforma,
+          note: obj.note
+        });
+      });
+
+      save();
+      render();
       setSyncStatus(`Import completato: ${products.length} prodotti caricati da Google Sheet.`, 'ok');
-    }catch(err){ setSyncStatus('Errore import: '+err.message, 'err'); }
-    finally{ delete window[callback]; script.remove(); }
-  };
+    })
+    .catch(err => {
+      setSyncStatus('Errore import: ' + err.message, 'err');
+    });
+}
   script.onerror=()=>{ setSyncStatus('Errore import: controlla URL Web App e permessi di accesso.', 'err'); delete window[callback]; script.remove(); };
   setSyncStatus('Import da Google Sheet in corso...');
   script.src=`${url}${sep}action=read&callback=${callback}&t=${Date.now()}`;
