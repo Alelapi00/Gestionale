@@ -66,8 +66,23 @@ button{border:0;border-radius:12px;padding:10px 13px;background:var(--dark);colo
   function save(){
   // codice...
 }
-
-function normalizeSheetDate(value) {
+  function init(){
+    var login = document.getElementById("loginScreen");
+    var input = document.getElementById("passwordInput");
+    var button = document.getElementById("loginButton");
+    if(!login || !input || !button) return;
+    try {
+      if(localStorage.getItem("auth_origo") === "true") {
+        login.style.display = "none";
+      }
+    } catch(e) {}
+    button.onclick = unlock;
+    input.onkeydown = function(e){ if(e.key === "Enter") unlock(); };
+  }
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+  function normalizeSheetDate(value) {
   if (!value) return "";
 
   if (typeof value === "string") {
@@ -93,22 +108,6 @@ function normalizeSheetDate(value) {
 
   return "";
 }
-  function init(){
-    var login = document.getElementById("loginScreen");
-    var input = document.getElementById("passwordInput");
-    var button = document.getElementById("loginButton");
-    if(!login || !input || !button) return;
-    try {
-      if(localStorage.getItem("auth_origo") === "true") {
-        login.style.display = "none";
-      }
-    } catch(e) {}
-    button.onclick = unlock;
-    input.onkeydown = function(e){ if(e.key === "Enter") unlock(); };
-  }
-  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-  else init();
-})();
 </script>
 
 <header>
