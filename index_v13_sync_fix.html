@@ -63,6 +63,36 @@ button{border:0;border-radius:12px;padding:10px 13px;background:var(--dark);colo
     }
   }
   window.checkPassword = unlock;
+  function save(){
+  // codice...
+}
+
+function normalizeSheetDate(value) {
+  if (!value) return "";
+
+  if (typeof value === "string") {
+    const cleaned = value.trim();
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(cleaned)) return cleaned;
+
+    const parts = cleaned.split("/");
+    if (parts.length === 3) {
+      const d = parts[0].padStart(2, "0");
+      const m = parts[1].padStart(2, "0");
+      const y = parts[2];
+      return `${y}-${m}-${d}`;
+    }
+
+    return cleaned;
+  }
+
+  if (typeof value === "number") {
+    const date = new Date((value - 25569) * 86400 * 1000);
+    return date.toISOString().slice(0, 10);
+  }
+
+  return "";
+}
   function init(){
     var login = document.getElementById("loginScreen");
     var input = document.getElementById("passwordInput");
