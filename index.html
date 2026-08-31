@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestionale Resell Origo - v15 BOX TikTok</title>
+<style>
+:root{
+  --bg:#f5f1ea;--card:#fff;--text:#171717;--muted:#6b7280;--border:#ded6ca;
+  --dark:#111827;--soft:#eee7dc;--green:#15803d;--red:#b91c1c;--blue:#1d4ed8;
+  --amber:#b45309;--purple:#7c3aed;--cyan:#0891b2;--ink:#070b14
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text)}
+header{background:var(--dark);color:white;padding:26px 28px}
+h1{margin:0 0 6px;font-size:28px;letter-spacing:-.04em}
+header p{margin:0;color:#d1d5db}
+main{max-width:1600px;margin:0 auto;padding:22px}
+.cards{display:grid;grid-template-columns:repeat(6,minmax(145px,1fr));gap:14px;margin-bottom:16px}
+.card,.panel{background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:0 8px 22px rgba(17,24,39,.06)}
+.kpi{padding:16px}.label{font-size:12px;text-transform:uppercase;color:var(--muted);letter-spacing:.04em}.value{font-size:25px;font-weight:850;letter-spacing:-.04em;margin-top:6px}.hint{font-size:12px;color:var(--muted);margin-top:4px}
+.green{color:var(--green)}.red{color:var(--red)}.blue{color:var(--blue)}.amber{color:var(--amber)}.purple{color:var(--purple)}.cyan{color:var(--cyan)}
+.tabs{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap}.tab{border:0;border-radius:999px;padding:10px 15px;background:var(--soft);color:var(--dark);font-weight:750;cursor:pointer}.tab.active{background:var(--dark);color:white}
+.panel{overflow:hidden;margin-bottom:18px}.panel-head{padding:15px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}.panel-head h2{margin:0;font-size:18px}.panel-head span{font-size:13px;color:var(--muted)}
+.toolbar{display:grid;grid-template-columns:1.4fr repeat(4,1fr) auto auto;gap:10px;margin-bottom:16px}
+input,select,textarea,button{font:inherit}input,select,textarea{width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 11px;background:#fff;outline:none}textarea{min-height:76px;resize:vertical}
+button{border:0;border-radius:12px;padding:10px 13px;background:var(--dark);color:white;font-weight:800;cursor:pointer;white-space:nowrap}button.secondary{background:var(--soft);color:var(--dark)}button.danger{background:var(--red)}button.small{padding:6px 9px;font-size:12px;border-radius:9px}
+.form{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px}.form .wide{grid-column:span 2}.form .full{grid-column:1/-1}
+.field label{display:block;font-size:12px;font-weight:800;color:#374151;margin:0 0 5px}.help{font-size:12px;color:var(--muted);margin-top:5px}.hidden{display:none!important}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:1280px}th,td{border-bottom:1px solid var(--border);padding:10px;text-align:left;vertical-align:middle;font-size:13px}th{background:#faf8f5;color:#4b5563;font-size:12px;text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0}td input,td select{padding:7px 8px;border-radius:9px;font-size:13px}.num{text-align:right}.sku{font-weight:850}.empty{padding:26px;text-align:center;color:var(--muted)}
+.progress{height:12px;background:#ede7dd;border-radius:999px;overflow:hidden;min-width:150px}.progress>div{height:100%;background:linear-gradient(90deg,#2563eb,#15803d);border-radius:999px}.progressLabel{font-size:12px;font-weight:800;color:#374151;margin-top:5px}
+.bale-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:18px}.bale-card{border:1px solid var(--border);border-radius:16px;padding:15px;background:#fff}.bale-title{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:12px}.bale-title h3{margin:0;font-size:18px}.mini{font-size:12px;color:var(--muted)}.bale-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}.metric{background:#faf8f5;border-radius:12px;padding:10px}.metric strong{display:block;font-size:15px;margin-top:4px}
+.dashboard-controls{display:grid;grid-template-columns:180px 180px 220px 1fr;gap:10px;padding:16px 18px;align-items:end}
+.country-chips{display:flex;gap:8px;flex-wrap:wrap;padding:0 18px 16px}.country-chip{background:#faf8f5;border:1px solid var(--border);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:800}.country-chip strong{margin-left:6px}.country-note{padding:0 18px 14px;color:var(--muted);font-size:13px}.country-table table{min-width:900px}.country-cell{line-height:1.35}.country-cell strong{display:block}.country-cell span{font-size:12px;color:var(--muted)}
+.info{padding:16px 18px;background:#fff7ed;border-top:1px solid #fed7aa;color:#7c2d12;font-size:14px;line-height:1.45}
+.sync-box{background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:18px;display:grid;grid-template-columns:1.2fr auto auto auto auto;gap:10px;align-items:end;box-shadow:0 8px 22px rgba(31,41,51,.05)}.sync-box label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}.sync-status{font-size:13px;color:var(--muted);padding:8px 0}.sync-status.ok{color:var(--green)}.sync-status.err{color:var(--red)}
+.archive-sync{background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:18px;box-shadow:0 8px 22px rgba(31,41,51,.05)}
+.archive-sync-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.archive-sync-head h3{margin:0;font-size:16px}
+.archive-sync-head p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.archive-sync-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.archive-sync-card{border:1px solid var(--border);border-radius:14px;padding:12px;background:#faf8f5}
+.archive-sync-card strong{display:block;margin-bottom:8px}
+.archive-sync-actions{display:flex;gap:8px;flex-wrap:wrap}
+.archive-sync-status{margin-top:8px;font-size:12px;color:var(--muted);min-height:18px}
+.archive-sync-status.ok{color:var(--green)}.archive-sync-status.err{color:var(--red)}
+@media(max-width:900px){.archive-sync-grid{grid-template-columns:1fr}}
+
+.pagination{display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 18px;border-top:1px solid var(--border);background:#fff}.pagination span{font-size:13px;color:var(--muted);font-weight:700}.pagination button:disabled{opacity:.45;cursor:not-allowed}
+
+/* BOX + TIKTOK */
+.action-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.entry-form{padding:18px;background:#fbfaf8;border-bottom:1px solid var(--border)}
+.entry-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.entry-grid .span2{grid-column:span 2}.entry-grid .full{grid-column:1/-1}
+.calc-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.calc-card{background:white;border:1px solid var(--border);border-radius:14px;padding:12px}.calc-card strong{display:block;font-size:20px;margin-top:5px}.sku-status{font-size:12px;margin-top:7px;line-height:1.45}.sku-status.ok{color:var(--green)}.sku-status.err{color:var(--red)}
+.history-table table{min-width:1050px}.sku-list{max-width:380px;white-space:normal;line-height:1.4}
+
+/* FUTURISTIC DASHBOARD */
+#dashboard .panel{background:linear-gradient(145deg,#070b14 0%,#0d1423 56%,#111827 100%);border-color:#202c40;color:#eef4ff;box-shadow:0 22px 65px rgba(4,10,24,.28)}
+#dashboard .panel-head{border-color:#26344b;background:rgba(255,255,255,.025)}
+#dashboard .panel-head h2{font-size:22px;letter-spacing:-.03em}
+#dashboard .panel-head span,#dashboard .help{color:#8fa1bc}
+#dashboard .field label{color:#aebbd0}
+#dashboard select{background:#0d1727;color:#eef4ff;border-color:#2b3a52}
+.dashboard-summary{display:grid;grid-template-columns:repeat(4,minmax(170px,1fr));gap:12px;padding:0 18px 18px}
+#dashboard .dashboard-summary .metric{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(255,255,255,.085),rgba(255,255,255,.035));border:1px solid #2b3a52;border-radius:18px;padding:16px;min-height:104px}
+#dashboard .dashboard-summary .metric:after{content:"";position:absolute;width:90px;height:90px;border-radius:50%;right:-32px;top:-34px;background:radial-gradient(circle,rgba(56,189,248,.22),transparent 68%)}
+#dashboard .dashboard-summary .label{color:#8fa1bc}
+#dashboard .dashboard-summary strong{font-size:25px;letter-spacing:-.04em;color:#f8fbff}
+#dashboard .dashboard-summary .green{color:#5ee59a}
+#dashboard .dashboard-summary .cyan{color:#67e8f9}
+#dashboard .table-wrap{padding:0 18px 18px}
+#dashboard table{min-width:750px;border:1px solid #26344b;border-radius:16px;overflow:hidden}
+#dashboard th{background:#0a1220;color:#8fa1bc;border-color:#26344b}
+#dashboard td{border-color:#202c40;background:rgba(255,255,255,.02)}
+#dashboard .green{color:#5ee59a}#dashboard .red{color:#fb7185}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;padding:0 18px 18px}.calendar-head{font-size:12px;text-transform:uppercase;color:#7588a5;font-weight:850;text-align:center}.calendar-day{min-height:108px;background:linear-gradient(145deg,#0c1626,#101b2d);border:1px solid #293a55;border-radius:15px;padding:11px;transition:.15s;color:#eef4ff;text-align:left;width:100%;white-space:normal}.calendar-day:not(.empty-day){cursor:pointer}.calendar-day:not(.empty-day):hover{transform:translateY(-2px);border-color:#436083;background:linear-gradient(145deg,#101d31,#14233a)}.calendar-day:focus{outline:2px solid #22d3ee;outline-offset:2px}.calendar-day.empty-day{background:#090f1b;border-style:dashed;cursor:default}.calendar-date{font-size:12px;color:#8fa1bc;font-weight:850}.calendar-net{font-size:19px;font-weight:900;margin-top:18px}.calendar-net-label{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#6f829f;margin-top:3px}.dash-badge{display:inline-flex;align-items:center;gap:6px;background:#0d1727;border:1px solid #2b3a52;border-radius:999px;padding:6px 10px;font-size:11px;color:#9fb0c8}.dash-dot{width:7px;height:7px;border-radius:50%;background:#22d3ee;box-shadow:0 0 12px #22d3ee}
+.dash-view-toggle{display:flex;gap:6px;background:#0b1321;border:1px solid #2b3a52;border-radius:12px;padding:4px}.dash-view-btn{background:transparent;color:#91a3bd;padding:8px 12px;border-radius:9px}.dash-view-btn.active{background:#eef4ff;color:#0b1220}.dash-detail-overlay{position:fixed;inset:0;background:rgba(2,6,15,.72);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:22px;z-index:99990}.dash-detail-modal{width:min(760px,100%);background:linear-gradient(145deg,#0b1321,#111d30);border:1px solid #31435f;border-radius:22px;color:#eef4ff;box-shadow:0 28px 80px rgba(0,0,0,.45);overflow:hidden}.dash-detail-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:18px 20px;border-bottom:1px solid #263750}.dash-detail-head h3{margin:3px 0 0;font-size:22px}.dash-detail-close{background:#18263b;color:#dce7f6;padding:8px 11px}.dash-detail-totals{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:18px 20px 10px}.dash-detail-total{background:#0c1728;border:1px solid #263750;border-radius:16px;padding:14px}.dash-detail-total strong{display:block;font-size:25px;margin-top:5px}.dash-channel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 20px 20px}.dash-channel-card{background:#0c1728;border:1px solid #263750;border-radius:16px;padding:14px}.dash-channel-card h4{margin:0 0 10px;font-size:14px}.dash-channel-line{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:#94a7c1;margin-top:7px}.dash-channel-line strong{color:#eef4ff;font-size:13px}.dash-channel-empty{opacity:.55}.channel-cell{line-height:1.4}.channel-cell strong{display:block}.channel-cell span{font-size:11px;color:#8fa1bc}
+@media(max-width:700px){.dash-detail-totals,.dash-channel-grid{grid-template-columns:1fr}.dash-detail-overlay{padding:10px}.dash-detail-modal{max-height:90vh;overflow:auto}}
+
+@media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr}.form .wide{grid-column:auto}.entry-grid{grid-template-columns:1fr 1fr}.calc-strip{grid-template-columns:1fr 1fr}.dashboard-summary{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.sync-box{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr}.dashboard-controls{grid-template-columns:1fr}.dashboard-summary{grid-template-columns:1fr}.calendar-grid{gap:4px;padding:0 8px 14px}.calendar-day{min-height:78px;padding:7px}.calendar-date{font-size:10px}.calendar-net{font-size:13px;margin-top:12px}.calendar-net-label{display:none}.calendar-head{font-size:9px}.entry-grid{grid-template-columns:1fr}.entry-grid .span2{grid-column:auto}.calc-strip{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" style="position:fixed;inset:0;background:#0b0f17;display:flex;align-items:center;justify-content:center;z-index:999999;">
+  <div style="background:#fff;padding:30px;border-radius:14px;text-align:center;width:320px;box-shadow:0 20px 50px rgba(0,0,0,.25);">
+    <h2 style="margin:0 0 14px;">Origo Accesso</h2>
+    <input id="passwordInput" type="password" placeholder="Password" autocomplete="current-password" style="width:100%;padding:12px;margin:10px 0;border:1px solid #ccc;border-radius:10px;">
+    <button id="loginButton" type="button" style="width:100%;padding:12px;background:#111827;color:white;border:none;border-radius:10px;font-weight:800;cursor:pointer;">Entra</button>
+    <p id="errorMsg" style="color:#b91c1c;font-size:13px;min-height:18px;margin:10px 0 0;"></p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var PASSWORD="origo123";
+  function unlock(){
+    var input=document.getElementById("passwordInput"),error=document.getElementById("errorMsg"),login=document.getElementById("loginScreen");
+    if(!input||!login)return;
+    if(String(input.value).trim()===PASSWORD){login.style.display="none";try{localStorage.setItem("auth_origo","true")}catch(e){}}
+    else if(error)error.textContent="Password errata";
+  }
+  function init(){
+    var login=document.getElementById("loginScreen"),input=document.getElementById("passwordInput"),button=document.getElementById("loginButton");
+    if(!login||!input||!button)return;
+    try{if(localStorage.getItem("auth_origo")==="true")login.style.display="none"}catch(e){}
+    button.onclick=unlock;input.onkeydown=function(e){if(e.key==="Enter")unlock()};
+  }
+  window.checkPassword=unlock;
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<header>
+  <h1>Gestionale Resell Origo</h1>
+  <p>Inventario, Bale, BOX, TikTok, Dashboard vendite e sincronizzazione manuale con Google Sheets.</p>
+</header>
+
+<main>
+  <section class="cards">
+    <div class="card kpi"><div class="label">Pezzi totali</div><div class="value" id="kpiTot">0</div><div class="hint">capi attualmente a gestionale</div></div>
+    <div class="card kpi"><div class="label">Disponibili</div><div class="value blue" id="kpiDisp">0</div><div class="hint">ancora in stock</div></div>
+    <div class="card kpi"><div class="label">Bale attive</div><div class="value purple" id="kpiBale">0</div><div class="hint">gruppi/bale presenti</div></div>
+    <div class="card kpi"><div class="label">Investimento attivo</div><div class="value amber" id="kpiInv">€0,00</div><div class="hint">costo capi disponibili</div></div>
+    <div class="card kpi"><div class="label">Fatturato</div><div class="value green" id="kpiFat">€0,00</div><div class="hint">vendite inventario + entrate TikTok</div></div>
+    <div class="card kpi"><div class="label">Guadagno netto</div><div class="value" id="kpiNet">€0,00</div><div class="hint">vendite inventario + TikTok</div></div>
+  </section>
+
+  <section class="tabs">
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="inventario">Inventario</button>
+    <button class="tab" data-tab="bale">Bale</button>
+    <button class="tab" data-tab="box">BOX</button>
+    <button class="tab" data-tab="tiktok">TikTok</button>
+    <button class="tab" data-tab="paesi">Paesi</button>
+    <button class="tab" data-tab="aggiungi">Aggiungi</button>
+  </section>
+
+  <section class="sync-box">
+    <div>
+      <label>Google Sheets collegato</label>
+      <input id="sheetUrl" value="https://script.google.com/macros/s/AKfycbyM8eBcSYcDof_sj0qiXcqcH4KVJ9_6f9kBVs4uxLb8pKw3n69_0ZACk4fMXF6Qryrz/exec" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
+    <button class="secondary" id="saveSheetUrlBtn">Salva URL</button>
+    <button class="secondary" id="resetSheetUrlBtn">URL predefinito</button>
+    <button id="importSheetBtn">Importa da Google Sheet</button>
+    <button id="exportSheetBtn">Esporta su Google Sheet</button>
+    <div class="sync-status" id="syncStatus">Sync manuale collegata.</div>
+  </section>
+
+  <section class="archive-sync">
+    <div class="archive-sync-head">
+      <div>
+        <h3>Sync archivi vendite</h3>
+        <p>Sincronizza gli archivi condivisi tra i due computer usando i fogli: SYNC BOX, SYNC TIKTOK e SINC WHOP.</p>
+      </div>
+      <div class="archive-sync-actions">
+        <button id="importAllArchivesBtn" class="secondary">Importa tutti gli archivi</button>
+        <button id="exportAllArchivesBtn">Esporta tutti gli archivi</button>
+      </div>
+    </div>
+    <div class="archive-sync-grid">
+      <div class="archive-sync-card">
+        <strong>SYNC BOX</strong>
+        <div class="archive-sync-actions">
+          <button id="importBoxSyncBtn" class="secondary small">Importa BOX</button>
+          <button id="exportBoxSyncBtn" class="small">Esporta BOX</button>
+        </div>
+        <div id="boxSyncStatus" class="archive-sync-status">Pronto.</div>
+      </div>
+      <div class="archive-sync-card">
+        <strong>SYNC TIKTOK</strong>
+        <div class="archive-sync-actions">
+          <button id="importTikTokSyncBtn" class="secondary small">Importa TikTok</button>
+          <button id="exportTikTokSyncBtn" class="small">Esporta TikTok</button>
+        </div>
+        <div id="tiktokSyncStatus" class="archive-sync-status">Pronto.</div>
+      </div>
+      <div class="archive-sync-card">
+        <strong>SINC WHOP</strong>
+        <div class="archive-sync-actions">
+          <button id="importWhopSyncBtn" class="secondary small">Importa WHOP</button>
+          <button id="exportWhopSyncBtn" class="small">Esporta WHOP</button>
+        </div>
+        <div id="whopSyncStatus" class="archive-sync-status">Pronto.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="inventario" class="tabpage hidden">
+    <div class="toolbar">
+      <input id="search" placeholder="Cerca SKU, gruppo, bale, paese, note...">
+      <select id="filterStato"><option value="">Tutti gli stati</option><option>disponibile</option><option>venduto</option></select>
+      <select id="filterBale"><option value="">Tutte le bale</option></select>
+      <select id="filterGruppo"><option value="">Tutti i gruppi</option></select>
+      <select id="sortBy"><option value="sku">Ordina per SKU</option><option value="bale">Ordina per bale</option><option value="gruppo">Ordina per gruppo</option><option value="costo_desc">Costo più alto</option><option value="vendita_desc">Vendita più alta</option></select>
+      <button class="secondary" id="exportBtn">Esporta CSV</button>
+      <button class="danger" id="resetBtn">Reset dati</button>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Inventario modificabile</h2><span>gli SKU usati in BOX/TikTok vengono rimossi definitivamente da qui</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>SKU</th><th>Bale</th><th>Gruppo</th><th>Stato</th><th class="num">Costo</th><th class="num">Vendita</th><th class="num">Guadagno venduto</th><th>Data acquisto</th><th>Data vendita</th><th>Paese</th><th>Pagamento</th><th>Note</th><th></th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="secondary small" id="prevPageBtn">← Precedente</button>
+        <span id="pageInfo">Pagina 1 di 1</span>
+        <button class="secondary small" id="nextPageBtn">Successiva →</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="bale" class="tabpage hidden">
+    <div class="panel">
+      <div class="panel-head"><h2>Bale</h2><span>avanzamento e rendimento sui capi ancora presenti nel gestionale</span></div>
+      <div class="bale-grid" id="baleCards"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Tabella Bale</h2><span>clicca “Vedi inventario” per filtrare i pezzi collegati</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Bale</th><th class="num">Pezzi</th><th class="num">Venduti</th><th>Completamento</th><th class="num">Costo totale</th><th class="num">Capitale attuale</th><th class="num">Fatturato</th><th class="num">Guadagno</th><th class="num">Manca a ripagare</th><th class="num">ROI</th><th></th></tr></thead>
+          <tbody id="baleBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="box" class="tabpage hidden">
+    <div class="panel">
+      <div class="panel-head">
+        <div><h2>BOX vendute</h2><span>crea una box, recupera automaticamente i costi SKU e rimuove i capi dall'inventario al salvataggio</span></div>
+        <div class="action-head"><button id="newBoxBtn">+ Nuova Box venduta</button></div>
+      </div>
+      <div id="boxForm" class="entry-form hidden">
+        <div class="entry-grid">
+          <div class="field span2"><label>Nome / riferimento Box</label><input id="boxName" placeholder="es. Box cliente 31/08"></div>
+          <div class="field"><label>Data vendita</label><input id="boxDate" type="date"></div>
+          <div class="field"><label>Vendita effettiva Box</label><input id="boxSale" type="number" step="0.01" placeholder="€"></div>
+          <div class="field full"><label>SKU inclusi</label><textarea id="boxSkus" placeholder="Incolla gli SKU separati da spazio, virgola, punto e virgola o una riga per SKU"></textarea><div id="boxSkuStatus" class="sku-status"></div></div>
+          <div class="field full"><label>Note</label><input id="boxNote" placeholder="opzionale"></div>
+        </div>
+        <div class="calc-strip">
+          <div class="calc-card"><span class="label">Pezzi</span><strong id="boxPieces">0</strong></div>
+          <div class="calc-card"><span class="label">Costo totale SKU</span><strong class="amber" id="boxCost">€0,00</strong></div>
+          <div class="calc-card"><span class="label">Vendita</span><strong class="green" id="boxSalePreview">€0,00</strong></div>
+          <div class="calc-card"><span class="label">Guadagno</span><strong id="boxProfit">€0,00</strong></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px"><button id="saveBoxBtn">Salva Box e rimuovi SKU</button><button class="secondary" id="cancelBoxBtn">Annulla</button></div>
+      </div>
+      <div class="table-wrap history-table">
+        <table>
+          <thead><tr><th>Data</th><th>Box</th><th>SKU</th><th class="num">Pezzi</th><th class="num">Costo</th><th class="num">Vendita</th><th class="num">Guadagno</th><th>Note</th><th></th></tr></thead>
+          <tbody id="boxBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="tiktok" class="tabpage hidden">
+    <div class="panel">
+      <div class="panel-head">
+        <div><h2>TikTok</h2><span>registra un'entrata aggregata, assegna gli SKU e distribuisce i risultati sui giorni della Dashboard</span></div>
+        <div class="action-head"><button id="newTikTokBtn">+ Nuova entrata</button></div>
+      </div>
+      <div id="tiktokForm" class="entry-form hidden">
+        <div class="entry-grid">
+          <div class="field"><label>Data iniziale periodo</label><input id="tiktokStartDate" type="date"></div>
+          <div class="field"><label>Numero giorni</label><input id="tiktokDays" type="number" min="1" value="1"></div>
+          <div class="field"><label>Entrata TikTok</label><input id="tiktokIncome" type="number" step="0.01" placeholder="importo ricevuto"></div>
+          <div class="field"><label>Descrizione</label><input id="tiktokName" placeholder="es. Live 29-31 agosto"></div>
+          <div class="field full"><label>SKU inclusi</label><textarea id="tiktokSkus" placeholder="Incolla gli SKU separati da spazio, virgola, punto e virgola o una riga per SKU"></textarea><div id="tiktokSkuStatus" class="sku-status"></div></div>
+          <div class="field full"><label>Note</label><input id="tiktokNote" placeholder="opzionale"></div>
+        </div>
+        <div class="calc-strip">
+          <div class="calc-card"><span class="label">Pezzi</span><strong id="tiktokPieces">0</strong></div>
+          <div class="calc-card"><span class="label">Costo SKU</span><strong class="amber" id="tiktokCost">€0,00</strong></div>
+          <div class="calc-card"><span class="label">Entrata</span><strong class="cyan" id="tiktokIncomePreview">€0,00</strong></div>
+          <div class="calc-card"><span class="label">Guadagno netto</span><strong id="tiktokProfit">€0,00</strong></div>
+        </div>
+        <div class="help" id="tiktokDailyPreview" style="margin-top:10px"></div>
+        <div style="display:flex;gap:10px;margin-top:14px"><button id="saveTikTokBtn">Salva entrata e rimuovi SKU</button><button class="secondary" id="cancelTikTokBtn">Annulla</button></div>
+      </div>
+      <div class="table-wrap history-table">
+        <table>
+          <thead><tr><th>Periodo</th><th>Descrizione</th><th>SKU</th><th class="num">Pezzi</th><th class="num">Costo SKU</th><th class="num">Entrata</th><th class="num">Guadagno netto</th><th class="num">Giorni</th><th></th></tr></thead>
+          <tbody id="tiktokBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="paesi" class="tabpage hidden">
+    <div class="panel">
+      <div class="panel-head"><h2>Paesi</h2><span>vendite inventario divise per giorno e per paese</span></div>
+      <div class="dashboard-controls">
+        <div class="field"><label>Anno</label><select id="countryYear"></select></div>
+        <div class="field"><label>Mese</label><select id="countryMonth"></select></div>
+        <div class="help">Usa i capi con stato venduto, data vendita e paese compilato.</div>
+      </div>
+      <div class="country-chips" id="countryChips"></div>
+      <div class="country-note">Ogni cella mostra fatturato · netto · pezzi venduti.</div>
+      <div class="table-wrap country-table"><table><thead id="countriesHead"></thead><tbody id="countriesBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="aggiungi" class="tabpage hidden">
+    <div class="panel">
+      <div class="panel-head"><h2>Aggiungi capo / gruppo</h2><span>per sequenze tipo c50-1, c50-2 ... c50-40</span></div>
+      <div class="form">
+        <div class="field"><label>Modalità</label><select id="mode"><option value="singolo">Singolo capo</option><option value="gruppo">Gruppo / sequenza</option></select></div>
+        <div class="field singleOnly"><label>SKU singolo</label><input id="skuSingolo" placeholder="es. c50-1"></div>
+        <div class="field groupOnly hidden"><label>Gruppo / prefisso</label><input id="gruppoPrefix" placeholder="es. c50"></div>
+        <div class="field groupOnly hidden"><label>Dal numero</label><input id="seqStart" type="number" value="1" min="1"></div>
+        <div class="field groupOnly hidden"><label>Al numero</label><input id="seqEnd" type="number" value="40" min="1"></div>
+        <div class="field"><label>Bale</label><input id="newBale" placeholder="es. Bale 2, c50..."><div class="help">Se vuoto usa il gruppo.</div></div>
+        <div class="field"><label>Stato</label><select id="newStato"><option>disponibile</option><option>venduto</option></select></div>
+        <div class="field"><label>Costo per capo</label><input id="newCosto" type="number" step="0.01"></div>
+        <div class="field"><label>Prezzo vendita</label><input id="newVendita" type="number" step="0.01"></div>
+        <div class="field"><label>Data acquisto</label><input id="newDataAcquisto" type="date"></div>
+        <div class="field saleOnly hidden"><label>Data vendita</label><input id="newDataVendita" type="date"></div>
+        <div class="field"><label>Paese</label><input id="newPaese"></div>
+        <div class="field"><label>Pagamento pendente</label><select id="newPend"><option>NO</option><option>SI</option></select></div>
+        <div class="field full"><label>Note</label><textarea id="newNote"></textarea></div>
+        <div class="field full"><button id="addBtn">Carica nel gestionale</button><div class="help" id="previewAdd"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="dashboard" class="tabpage">
+    <div class="panel">
+      <div class="panel-head">
+        <div><h2>Dashboard vendite</h2><span>calendario netto giornaliero con dettaglio Vinted · BOX · TikTok</span></div>
+        <div class="dash-badge"><span class="dash-dot"></span> LIVE DATA</div>
+      </div>
+      <div class="dashboard-controls">
+        <div class="field"><label>Anno</label><select id="dashYear"></select></div>
+        <div class="field"><label>Mese</label><select id="dashMonth"></select></div>
+        <div class="field"><label>Visuale</label><div class="dash-view-toggle"><button type="button" id="dashCalendarBtn" class="dash-view-btn active">Calendario</button><button type="button" id="dashListBtn" class="dash-view-btn">Lista</button></div><input type="hidden" id="dashView" value="calendario"></div>
+        <div class="help">Nel calendario vedi solo il guadagno netto. Clicca un giorno per aprire fatturato, netto e divisione tra Vinted, BOX e TikTok.</div>
+      </div>
+      <div class="dashboard-summary">
+        <div class="metric"><span class="label">Fatturato mese</span><strong class="green" id="dashFat">€0,00</strong></div>
+        <div class="metric"><span class="label">Guadagno netto mese</span><strong id="dashNet">€0,00</strong></div>
+        <div class="metric"><span class="label">Pezzi venduti mese</span><strong id="dashPieces">0</strong></div>
+        <div class="metric"><span class="label">Entrate TikTok mese</span><strong class="cyan" id="dashTikTok">€0,00</strong></div>
+      </div>
+      <div id="dashCalendarWrap"><div class="calendar-grid" id="calendarGrid"></div></div>
+      <div id="dashListWrap" class="table-wrap hidden">
+        <table>
+          <thead><tr><th>Giorno</th><th class="num">Fatturato</th><th class="num">Guadagno netto</th><th class="num">Pezzi</th><th class="num">Vinted</th><th class="num">BOX</th><th class="num">TikTok</th></tr></thead>
+          <tbody id="dashBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="dashDetailOverlay" class="dash-detail-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dashDetailTitle">
+      <div class="dash-detail-modal">
+        <div class="dash-detail-head"><div><div class="mini" id="dashDetailDate"></div><h3 id="dashDetailTitle">Dettaglio giornata</h3></div><button type="button" class="dash-detail-close" id="dashDetailClose">Chiudi</button></div>
+        <div class="dash-detail-totals">
+          <div class="dash-detail-total"><span class="label">Fatturato totale</span><strong class="green" id="detailFat">€0,00</strong></div>
+          <div class="dash-detail-total"><span class="label">Guadagno netto totale</span><strong id="detailNet">€0,00</strong></div>
+        </div>
+        <div class="dash-channel-grid" id="dashChannelGrid"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* Dati iniziali equivalenti ai 350 prodotti della versione precedente */
+const INITIAL_GROUPS=[
+ ['tp2',9,2.75],['nylon',5,8.54],['tp',4,7.93],['nikeh',1,9.68],['lth',4,36.6],['lth1',3,11.85],
+ ['mixfr',14,3.4],['cdpants',5,13.22],['w7',5,5.65],['jersey',15,6.62],['r1',1,5.05],['vintage',3,13.3],
+ ['tp3',2,10],['carpj',14,3.31],['m2',26,9.69],['cj',4,7.66],['levis1',14,6.25],['mss2',22,12],
+ ['tree',5,25],['w5',10,2.1],['tv',1,10],['tnf1',1,9.85],['fblu',1,20],['levis',1,9.63],
+ ['mixj2',2,14.45],['car1',1,9.92],['car2',5,13.23],['mss',5,12],['w2',12,2.66],['w3',24,3.31],
+ ['m1',7,6.6],['y2k3',12,4.57],['mixj',12,7.32],['fish',5,5.65],['nikeh1',28,9.56],
+ ['w6',27,4.97],['car8',11,15.67],['car6',26,10.73],['jack',3,5]
+];
+function buildInitialProducts(){
+  let id=1,out=[];
+  INITIAL_GROUPS.forEach(([prefix,count,costo])=>{
+    for(let n=1;n<=count;n++)out.push({
+      id:id++,sku:`${prefix}-${n}`,gruppo:prefix,stato:'disponibile',costo, vendita:0,
+      dataAcquisto:'2026-04-24',dataVendita:'',pagamentoPendente:'NO',zona:'',paese:'',
+      piattaforma:'Vinted',note:'',bale:prefix
+    });
+  });
+  return out;
+}
+const initialProducts=buildInitialProducts();
+
+const KEY='origo_gestionale_v6_sheets';
+const BOX_KEY='origo_boxes_v15';
+const TIKTOK_KEY='origo_tiktok_v15';
+const WHOP_KEY='origo_whop_v15';
+const SYNC_SHEETS={
+  box:'SYNC BOX',
+  tiktok:'SYNC TIKTOK',
+  whop:'SINC WHOP'
+};
+const DEFAULT_SHEET_URL='https://script.google.com/macros/s/AKfycbyM8eBcSYcDof_sj0qiXcqcH4KVJ9_6f9kBVs4uxLb8pKw3n69_0ZACk4fMXF6Qryrz/exec';
+const SHEET_URL_KEY='origo_google_sheet_webapp_url_v13';
+
+let products=loadJson(KEY,structuredClone(initialProducts));
+let boxes=loadJson(BOX_KEY,[]);
+let tiktokEntries=loadJson(TIKTOK_KEY,[]);
+let whopEntries=loadJson(WHOP_KEY,[]);
+const PAGE_SIZE=50;
+let currentPage=1;
+
+function loadJson(key,fallback){try{const saved=localStorage.getItem(key);if(saved)return JSON.parse(saved)}catch(e){}return fallback}
+function saveAll(){
+  localStorage.setItem(KEY,JSON.stringify(products));
+  localStorage.setItem(BOX_KEY,JSON.stringify(boxes));
+  localStorage.setItem(TIKTOK_KEY,JSON.stringify(tiktokEntries));
+  localStorage.setItem(WHOP_KEY,JSON.stringify(whopEntries));
+}
+function money(n){return(Number(n)||0).toLocaleString('it-IT',{style:'currency',currency:'EUR'})}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function parseNum(v){return Number(String(v??'').replace(',','.'))||0}
+function isSold(p){return String(p.stato||'').toLowerCase()==='venduto'}
+function groupFromSku(sku){const m=String(sku||'').match(/^(.*)-(\d+)$/);return m?m[1]:''}
+function today(){return new Date().toISOString().slice(0,10)}
+function addDays(dateStr,n){const d=new Date(dateStr+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+function normalizeDate(v){
+  if(v===null||v===undefined||v==='')return'';
+  if(typeof v==='number'||/^\d+(\.\d+)?$/.test(String(v).trim())){
+    const n=Number(v);if(n>20000&&n<80000){const d=new Date(Math.round((n-25569)*86400*1000));if(!isNaN(d))return d.toISOString().slice(0,10)}
+  }
+  const str=String(v).trim();if(/^\d{4}-\d{2}-\d{2}$/.test(str))return str;if(/^\d{4}-\d{2}-\d{2}T/.test(str))return str.slice(0,10);
+  const m=str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);if(m){const d=m[1].padStart(2,'0'),mo=m[2].padStart(2,'0'),y=m[3].length===2?'20'+m[3]:m[3];return`${y}-${mo}-${d}`}
+  const d=new Date(str);return!isNaN(d)?d.toISOString().slice(0,10):''
+}
+function normalizeProduct(p){
+  p.stato=isSold(p)?'venduto':'disponibile';p.gruppo=p.gruppo||groupFromSku(p.sku);p.bale=p.bale||p.gruppo||'Senza bale';
+  p.costo=parseNum(p.costo);p.vendita=parseNum(p.vendita);p.dataAcquisto=normalizeDate(p.dataAcquisto);p.dataVendita=normalizeDate(p.dataVendita);
+  if(!isSold(p))p.dataVendita='';return p
+}
+function parseSkuInput(v){return [...new Set(String(v||'').split(/[\s,;]+/).map(x=>x.trim()).filter(Boolean))]}
+function skuLookup(skus){
+  const map=new Map(products.map(p=>[String(p.sku).trim().toLowerCase(),p]));
+  const found=[],missing=[];
+  skus.forEach(s=>{const p=map.get(s.toLowerCase());if(p)found.push(p);else missing.push(s)});
+  return{found,missing,cost:found.reduce((s,p)=>s+parseNum(p.costo),0)}
+}
+function removeProductsBySku(skus){
+  const set=new Set(skus.map(s=>s.toLowerCase()));
+  products=products.filter(p=>!set.has(String(p.sku).toLowerCase()));
+}
+
+function getBaleRows(){
+  const map=new Map();
+  products.forEach(p=>{normalizeProduct(p);const b=p.bale||'Senza bale';if(!map.has(b))map.set(b,{pezzi:0,disp:0,vend:0,costoTot:0,fat:0,costoVend:0,groups:new Map()});
+    const r=map.get(b);r.pezzi++;r.costoTot+=p.costo||0;r.groups.set(p.gruppo||'Senza gruppo',(r.groups.get(p.gruppo||'Senza gruppo')||0)+1);
+    if(isSold(p)){r.vend++;r.fat+=p.vendita||0;r.costoVend+=p.costo||0}else r.disp++;
+  });
+  return[...map.entries()].map(([b,r])=>{r.name=b;r.completion=r.pezzi?(r.vend/r.pezzi)*100:0;r.netEffettivo=r.fat-r.costoVend;r.manca=Math.max(r.costoTot-r.fat,0);r.capitaleInvestitoAttuale=Math.max(r.costoTot-r.costoVend,0);r.roiEffettivo=r.costoVend?(r.netEffettivo/r.costoVend)*100:0;r.mainGroups=[...r.groups.entries()].sort((a,b)=>b[1]-a[1]).slice(0,4).map(x=>x[0]).join(', ');return r}).sort((a,b)=>a.name.localeCompare(b.name,'it',{numeric:true}))
+}
+function filteredProducts(){
+  const q=document.getElementById('search').value.trim().toLowerCase(),stato=document.getElementById('filterStato').value,bale=document.getElementById('filterBale').value,gruppo=document.getElementById('filterGruppo').value,sort=document.getElementById('sortBy').value;
+  let rows=products.filter(p=>{const hay=[p.sku,p.bale,p.gruppo,p.paese,p.note,p.stato].join(' ').toLowerCase();return(!q||hay.includes(q))&&(!stato||p.stato===stato)&&(!bale||p.bale===bale)&&(!gruppo||p.gruppo===gruppo)});
+  rows.sort((a,b)=>{if(sort==='costo_desc')return(b.costo||0)-(a.costo||0);if(sort==='vendita_desc')return(b.vendita||0)-(a.vendita||0);if(sort==='bale')return String(a.bale).localeCompare(String(b.bale),'it',{numeric:true})||String(a.sku).localeCompare(String(b.sku),'it',{numeric:true});if(sort==='gruppo')return String(a.gruppo).localeCompare(String(b.gruppo),'it',{numeric:true})||String(a.sku).localeCompare(String(b.sku),'it',{numeric:true});return String(a.sku).localeCompare(String(b.sku),'it',{numeric:true})});
+  return rows
+}
+function render(){products.forEach(normalizeProduct);renderFilters();renderKpis();renderTable();renderBales();renderBoxes();renderTikTok();renderDashboard();renderCountries();updateFormVisibility()}
+function renderKpis(){
+  const tot=products.length,disp=products.filter(p=>!isSold(p)).length,inv=products.filter(p=>!isSold(p)).reduce((s,p)=>s+p.costo,0);
+  const normalFat=products.filter(isSold).reduce((s,p)=>s+p.vendita,0),normalCost=products.filter(isSold).reduce((s,p)=>s+p.costo,0);
+  const tikFat=tiktokEntries.reduce((s,e)=>s+parseNum(e.income),0),tikProfit=tiktokEntries.reduce((s,e)=>s+parseNum(e.profit),0);
+  const fat=normalFat+tikFat,net=(normalFat-normalCost)+tikProfit;
+  document.getElementById('kpiTot').textContent=tot;document.getElementById('kpiDisp').textContent=disp;document.getElementById('kpiBale').textContent=getBaleRows().length;document.getElementById('kpiInv').textContent=money(inv);document.getElementById('kpiFat').textContent=money(fat);document.getElementById('kpiNet').textContent=money(net);document.getElementById('kpiNet').className='value '+(net>=0?'green':'red')
+}
+function renderFilters(){
+  const fg=document.getElementById('filterGruppo'),fb=document.getElementById('filterBale'),oldG=fg.value,oldB=fb.value;
+  const groups=[...new Set(products.map(p=>p.gruppo).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it',{numeric:true})),bales=[...new Set(products.map(p=>p.bale).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it',{numeric:true}));
+  fg.innerHTML='<option value="">Tutti i gruppi</option>'+groups.map(g=>`<option ${g===oldG?'selected':''}>${esc(g)}</option>`).join('');
+  fb.innerHTML='<option value="">Tutte le bale</option>'+bales.map(b=>`<option ${b===oldB?'selected':''}>${esc(b)}</option>`).join('')
+}
+function renderTable(){
+  const rows=filteredProducts(),totalPages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));currentPage=Math.max(1,Math.min(currentPage,totalPages));const start=(currentPage-1)*PAGE_SIZE,pageRows=rows.slice(start,start+PAGE_SIZE);
+  document.getElementById('tbody').innerHTML=pageRows.map(p=>{const idx=products.indexOf(p),gain=isSold(p)?p.vendita-p.costo:0;return`<tr data-idx="${idx}">
+  <td class="sku"><input data-field="sku" value="${esc(p.sku)}"></td><td><input data-field="bale" value="${esc(p.bale)}"></td><td><input data-field="gruppo" value="${esc(p.gruppo)}"></td>
+  <td><select data-field="stato"><option ${p.stato==='disponibile'?'selected':''}>disponibile</option><option ${p.stato==='venduto'?'selected':''}>venduto</option></select></td>
+  <td class="num"><input data-field="costo" type="number" step="0.01" value="${p.costo}"></td><td class="num"><input data-field="vendita" type="number" step="0.01" value="${p.vendita}"></td>
+  <td class="num ${gain>=0?'green':'red'}">${isSold(p)?money(gain):'—'}</td><td><input data-field="dataAcquisto" type="date" value="${esc(p.dataAcquisto)}"></td>
+  <td><input data-field="dataVendita" type="date" value="${esc(p.dataVendita)}" ${!isSold(p)?'disabled':''}></td><td><input data-field="paese" value="${esc(p.paese)}"></td>
+  <td><select data-field="pagamentoPendente"><option ${p.pagamentoPendente==='NO'?'selected':''}>NO</option><option ${p.pagamentoPendente==='SI'?'selected':''}>SI</option></select></td><td><input data-field="note" value="${esc(p.note)}"></td><td><button class="small danger" data-delete="${idx}">Elimina</button></td></tr>`}).join('')||`<tr><td colspan="13" class="empty">Nessun prodotto trovato.</td></tr>`;
+  const from=rows.length?start+1:0,to=Math.min(start+PAGE_SIZE,rows.length);document.getElementById('pageInfo').textContent=`${from}-${to} di ${rows.length} prodotti · pagina ${currentPage}/${totalPages}`;document.getElementById('prevPageBtn').disabled=currentPage<=1;document.getElementById('nextPageBtn').disabled=currentPage>=totalPages
+}
+function renderBales(){
+  const rows=getBaleRows();
+  document.getElementById('baleCards').innerHTML=rows.map(r=>`<div class="bale-card"><div class="bale-title"><div><h3>${esc(r.name)}</h3><div class="mini">${esc(r.mainGroups||'nessun gruppo')}</div></div><button class="small secondary" data-view-bale="${esc(r.name)}">Vedi</button></div><div class="progress"><div style="width:${Math.min(100,r.completion).toFixed(1)}%"></div></div><div class="progressLabel">${r.vend}/${r.pezzi} venduti · ${r.completion.toFixed(1)}%</div><div class="bale-metrics"><div class="metric"><span class="label">Costo totale</span><strong>${money(r.costoTot)}</strong></div><div class="metric"><span class="label">Capitale attuale</span><strong class="amber">${money(r.capitaleInvestitoAttuale)}</strong></div><div class="metric"><span class="label">Fatturato</span><strong class="green">${money(r.fat)}</strong></div><div class="metric"><span class="label">Guadagno</span><strong class="${r.netEffettivo>=0?'green':'red'}">${money(r.netEffettivo)}</strong></div><div class="metric"><span class="label">Manca</span><strong class="${r.manca===0?'green':'amber'}">${money(r.manca)}</strong></div><div class="metric"><span class="label">ROI</span><strong>${r.costoVend?r.roiEffettivo.toFixed(1)+'%':'—'}</strong></div></div></div>`).join('')||'<div class="empty">Nessuna bale presente.</div>';
+  document.getElementById('baleBody').innerHTML=rows.map(r=>`<tr><td class="sku">${esc(r.name)}<div class="mini">${esc(r.mainGroups)}</div></td><td class="num">${r.pezzi}</td><td class="num">${r.vend}</td><td><div class="progress"><div style="width:${Math.min(100,r.completion).toFixed(1)}%"></div></div><div class="progressLabel">${r.completion.toFixed(1)}%</div></td><td class="num">${money(r.costoTot)}</td><td class="num amber">${money(r.capitaleInvestitoAttuale)}</td><td class="num green">${money(r.fat)}</td><td class="num">${money(r.netEffettivo)}</td><td class="num">${money(r.manca)}</td><td class="num">${r.costoVend?r.roiEffettivo.toFixed(1)+'%':'—'}</td><td><button class="small secondary" data-view-bale="${esc(r.name)}">Vedi inventario</button></td></tr>`).join('')
+}
+
+/* BOX */
+function previewBox(){
+  const skus=parseSkuInput(document.getElementById('boxSkus').value),r=skuLookup(skus),sale=parseNum(document.getElementById('boxSale').value),profit=sale-r.cost;
+  document.getElementById('boxPieces').textContent=r.found.length;document.getElementById('boxCost').textContent=money(r.cost);document.getElementById('boxSalePreview').textContent=money(sale);document.getElementById('boxProfit').textContent=money(profit);document.getElementById('boxProfit').className=profit>=0?'green':'red';
+  const st=document.getElementById('boxSkuStatus');st.textContent=!skus.length?'Inserisci almeno uno SKU.':r.missing.length?`SKU non trovati: ${r.missing.join(', ')}`:`Tutti i ${r.found.length} SKU sono presenti nell'inventario.`;st.className='sku-status '+(skus.length&&!r.missing.length?'ok':r.missing.length?'err':'')
+}
+function saveBox(){
+  const skus=parseSkuInput(document.getElementById('boxSkus').value),r=skuLookup(skus),sale=parseNum(document.getElementById('boxSale').value),date=document.getElementById('boxDate').value||today(),name=document.getElementById('boxName').value.trim()||`Box ${date}`;
+  if(!skus.length)return alert('Inserisci almeno uno SKU.');if(r.missing.length)return alert('Questi SKU non esistono nel gestionale: '+r.missing.join(', '));
+  if(!confirm(`Salvare la Box e rimuovere definitivamente ${r.found.length} SKU dall'inventario?`))return;
+  boxes.unshift({id:'box_'+Date.now(),name,date,skus:r.found.map(p=>p.sku),items:r.found.map(p=>({sku:p.sku,costo:p.costo,bale:p.bale,gruppo:p.gruppo})),pieces:r.found.length,cost:r.cost,sale,profit:sale-r.cost,note:document.getElementById('boxNote').value.trim(),createdAt:new Date().toISOString()});
+  removeProductsBySku(r.found.map(p=>p.sku));saveAll();resetBoxForm();render()
+}
+function resetBoxForm(){document.getElementById('boxForm').classList.add('hidden');['boxName','boxSkus','boxSale','boxNote'].forEach(id=>document.getElementById(id).value='');document.getElementById('boxDate').value=today();previewBox()}
+function renderBoxes(){
+  document.getElementById('boxBody').innerHTML=boxes.map(b=>`<tr><td>${esc(b.date)}</td><td class="sku">${esc(b.name)}</td><td class="sku-list">${esc((b.skus||[]).join(', '))}</td><td class="num">${b.pieces||b.skus?.length||0}</td><td class="num amber">${money(b.cost)}</td><td class="num green">${money(b.sale)}</td><td class="num ${(b.profit||0)>=0?'green':'red'}">${money(b.profit)}</td><td>${esc(b.note||'')}</td><td><button class="small danger" data-delete-box="${esc(b.id)}">Elimina storico</button></td></tr>`).join('')||'<tr><td colspan="9" class="empty">Nessuna Box venduta registrata.</td></tr>'
+}
+
+/* TIKTOK */
+function previewTikTok(){
+  const skus=parseSkuInput(document.getElementById('tiktokSkus').value),r=skuLookup(skus),income=parseNum(document.getElementById('tiktokIncome').value),days=Math.max(1,parseInt(document.getElementById('tiktokDays').value||'1',10)),profit=income-r.cost;
+  document.getElementById('tiktokPieces').textContent=r.found.length;document.getElementById('tiktokCost').textContent=money(r.cost);document.getElementById('tiktokIncomePreview').textContent=money(income);document.getElementById('tiktokProfit').textContent=money(profit);document.getElementById('tiktokProfit').className=profit>=0?'green':'red';
+  document.getElementById('tiktokDailyPreview').textContent=`Su ${days} giorni: entrata ${money(income/days)} / giorno · guadagno netto ${money(profit/days)} / giorno.`;
+  const st=document.getElementById('tiktokSkuStatus');st.textContent=!skus.length?'Inserisci almeno uno SKU.':r.missing.length?`SKU non trovati: ${r.missing.join(', ')}`:`Tutti i ${r.found.length} SKU sono presenti nell'inventario.`;st.className='sku-status '+(skus.length&&!r.missing.length?'ok':r.missing.length?'err':'')
+}
+function saveTikTok(){
+  const skus=parseSkuInput(document.getElementById('tiktokSkus').value),r=skuLookup(skus),income=parseNum(document.getElementById('tiktokIncome').value),days=Math.max(1,parseInt(document.getElementById('tiktokDays').value||'1',10)),startDate=document.getElementById('tiktokStartDate').value||today(),name=document.getElementById('tiktokName').value.trim()||`TikTok ${startDate}`,profit=income-r.cost;
+  if(!skus.length)return alert('Inserisci almeno uno SKU.');if(r.missing.length)return alert('Questi SKU non esistono nel gestionale: '+r.missing.join(', '));if(days<1)return alert('Numero giorni non valido.');
+  if(!confirm(`Salvare l'entrata TikTok e rimuovere definitivamente ${r.found.length} SKU dall'inventario?`))return;
+  tiktokEntries.unshift({id:'tt_'+Date.now(),name,startDate,days,endDate:addDays(startDate,days-1),skus:r.found.map(p=>p.sku),items:r.found.map(p=>({sku:p.sku,costo:p.costo,bale:p.bale,gruppo:p.gruppo})),pieces:r.found.length,cost:r.cost,income,profit,note:document.getElementById('tiktokNote').value.trim(),createdAt:new Date().toISOString()});
+  removeProductsBySku(r.found.map(p=>p.sku));saveAll();resetTikTokForm();render()
+}
+function resetTikTokForm(){document.getElementById('tiktokForm').classList.add('hidden');['tiktokSkus','tiktokIncome','tiktokName','tiktokNote'].forEach(id=>document.getElementById(id).value='');document.getElementById('tiktokDays').value=1;document.getElementById('tiktokStartDate').value=today();previewTikTok()}
+function renderTikTok(){
+  document.getElementById('tiktokBody').innerHTML=tiktokEntries.map(e=>`<tr><td>${esc(e.startDate)} → ${esc(e.endDate||addDays(e.startDate,(e.days||1)-1))}</td><td class="sku">${esc(e.name)}</td><td class="sku-list">${esc((e.skus||[]).join(', '))}</td><td class="num">${e.pieces||e.skus?.length||0}</td><td class="num amber">${money(e.cost)}</td><td class="num cyan">${money(e.income)}</td><td class="num ${(e.profit||0)>=0?'green':'red'}">${money(e.profit)}</td><td class="num">${e.days||1}</td><td><button class="small danger" data-delete-tiktok="${esc(e.id)}">Elimina storico</button></td></tr>`).join('')||'<tr><td colspan="9" class="empty">Nessuna entrata TikTok registrata.</td></tr>'
+}
+
+/* DASHBOARD */
+function monthName(m){return new Date(2000,m-1,1).toLocaleString('it-IT',{month:'long'})}
+function dateKeyParts(key){const[y,m,d]=String(key||'').split('-').map(Number);return{y,m,d}}
+function soldProductsWithDate(){return products.filter(p=>isSold(p)&&/^\d{4}-\d{2}-\d{2}$/.test(String(p.dataVendita||'')))}
+function boxesWithDate(){return boxes.filter(b=>/^\d{4}-\d{2}-\d{2}$/.test(String(b.date||'')))}
+function allDashboardYears(){
+  const now=new Date(),years=soldProductsWithDate().map(p=>dateKeyParts(p.dataVendita).y);
+  boxesWithDate().forEach(b=>years.push(dateKeyParts(b.date).y));
+  tiktokEntries.forEach(e=>{for(let i=0;i<(e.days||1);i++)years.push(dateKeyParts(addDays(e.startDate,i)).y)});
+  years.push(now.getFullYear());return[...new Set(years.filter(Boolean))].sort((a,b)=>b-a)
+}
+function renderDashboardFilters(){
+  const yEl=document.getElementById('dashYear'),mEl=document.getElementById('dashMonth'),now=new Date(),years=allDashboardYears(),oldY=yEl.value||String(now.getFullYear()),oldM=mEl.value||String(now.getMonth()+1).padStart(2,'0');
+  yEl.innerHTML=years.map(y=>`<option value="${y}" ${String(y)===oldY?'selected':''}>${y}</option>`).join('');
+  mEl.innerHTML=Array.from({length:12},(_,i)=>{const v=String(i+1).padStart(2,'0');return`<option value="${v}" ${v===oldM?'selected':''}>${monthName(i+1)}</option>`}).join('')
+}
+function getDashboardDays(){
+  const y=Number(document.getElementById('dashYear')?.value||new Date().getFullYear()),m=Number(document.getElementById('dashMonth')?.value||(new Date().getMonth()+1)),daysInMonth=new Date(y,m,0).getDate();
+  const rows=Array.from({length:daysInMonth},(_,i)=>({
+    day:i+1,date:`${y}-${String(m).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`,
+    vinted:{fat:0,net:0,pieces:0},box:{fat:0,net:0,pieces:0},tiktok:{fat:0,net:0,pieces:0},fat:0,net:0,totalPieces:0
+  }));
+  soldProductsWithDate().forEach(p=>{
+    const d=dateKeyParts(p.dataVendita),r=d.y===y&&d.m===m?rows[d.d-1]:null;if(!r)return;
+    const fat=parseNum(p.vendita),net=fat-parseNum(p.costo);r.vinted.fat+=fat;r.vinted.net+=net;r.vinted.pieces+=1;
+  });
+  boxesWithDate().forEach(b=>{
+    const d=dateKeyParts(b.date),r=d.y===y&&d.m===m?rows[d.d-1]:null;if(!r)return;
+    r.box.fat+=parseNum(b.sale);r.box.net+=parseNum(b.profit);r.box.pieces+=Number(b.pieces)||((b.skus||[]).length)||0;
+  });
+  tiktokEntries.forEach(e=>{
+    const days=Math.max(1,Number(e.days)||1),dailyIncome=parseNum(e.income)/days,dailyProfit=parseNum(e.profit)/days,pieces=(Number(e.pieces)||((e.skus||[]).length)||0)/days;
+    for(let i=0;i<days;i++){
+      const d=dateKeyParts(addDays(e.startDate,i)),r=d.y===y&&d.m===m?rows[d.d-1]:null;if(!r)continue;
+      r.tiktok.fat+=dailyIncome;r.tiktok.net+=dailyProfit;r.tiktok.pieces+=pieces;
+    }
+  });
+  rows.forEach(r=>{
+    r.fat=r.vinted.fat+r.box.fat+r.tiktok.fat;
+    r.net=r.vinted.net+r.box.net+r.tiktok.net;
+    r.totalPieces=r.vinted.pieces+r.box.pieces+r.tiktok.pieces;
+  });
+  return{year:y,month:m,rows}
+}
+function channelCell(c){
+  if(!c.fat&&!c.net&&!c.pieces)return'<span class="mini">—</span>';
+  return`<div class="channel-cell"><strong>${money(c.fat)}</strong><span>netto ${money(c.net)} · ${Number.isInteger(c.pieces)?c.pieces:c.pieces.toFixed(1)} pz</span></div>`
+}
+function renderDashboard(){
+  renderDashboardFilters();
+  const{year,month,rows}=getDashboardDays(),fat=rows.reduce((s,r)=>s+r.fat,0),net=rows.reduce((s,r)=>s+r.net,0),pieces=rows.reduce((s,r)=>s+r.totalPieces,0),tt=rows.reduce((s,r)=>s+r.tiktok.fat,0);
+  document.getElementById('dashFat').textContent=money(fat);document.getElementById('dashNet').textContent=money(net);document.getElementById('dashNet').className=net>=0?'green':'red';document.getElementById('dashPieces').textContent=Number.isInteger(pieces)?pieces:pieces.toFixed(1);document.getElementById('dashTikTok').textContent=money(tt);
+  document.getElementById('dashBody').innerHTML=rows.map(r=>`<tr><td class="sku">${String(r.day).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year}</td><td class="num green">${money(r.fat)}</td><td class="num ${r.net>=0?'green':'red'}">${money(r.net)}</td><td class="num">${Number.isInteger(r.totalPieces)?r.totalPieces:r.totalPieces.toFixed(1)}</td><td class="num">${channelCell(r.vinted)}</td><td class="num">${channelCell(r.box)}</td><td class="num">${channelCell(r.tiktok)}</td></tr>`).join('');
+  renderCalendar(year,month,rows);setDashboardView(document.getElementById('dashView').value||'calendario')
+}
+function renderCalendar(year,month,rows){
+  const grid=document.getElementById('calendarGrid'),names=['Lun','Mar','Mer','Gio','Ven','Sab','Dom'],offset=(new Date(year,month-1,1).getDay()+6)%7,cells=[];
+  names.forEach(n=>cells.push(`<div class="calendar-head">${n}</div>`));for(let i=0;i<offset;i++)cells.push('<div class="calendar-day empty-day"></div>');
+  rows.forEach(r=>cells.push(`<button type="button" class="calendar-day" data-dash-date="${r.date}" title="Apri dettaglio del ${r.day} ${monthName(month)}"><div class="calendar-date">${r.day} ${monthName(month)}</div><div class="calendar-net ${r.net>=0?'green':'red'}">${money(r.net)}</div><div class="calendar-net-label">Guadagno netto</div></button>`));
+  grid.innerHTML=cells.join('')
+}
+function setDashboardView(view){
+  const calendar=view!=='lista';document.getElementById('dashView').value=calendar?'calendario':'lista';document.getElementById('dashCalendarWrap').classList.toggle('hidden',!calendar);document.getElementById('dashListWrap').classList.toggle('hidden',calendar);document.getElementById('dashCalendarBtn').classList.toggle('active',calendar);document.getElementById('dashListBtn').classList.toggle('active',!calendar)
+}
+function openDashboardDay(date){
+  const data=getDashboardDays(),r=data.rows.find(x=>x.date===date);if(!r)return;
+  document.getElementById('dashDetailDate').textContent=`${String(r.day).padStart(2,'0')} ${monthName(data.month)} ${data.year}`;
+  document.getElementById('detailFat').textContent=money(r.fat);const net=document.getElementById('detailNet');net.textContent=money(r.net);net.className=r.net>=0?'green':'red';
+  const channels=[['Vinted',r.vinted],['BOX',r.box],['TikTok',r.tiktok]];
+  document.getElementById('dashChannelGrid').innerHTML=channels.map(([name,c])=>`<div class="dash-channel-card ${!c.fat&&!c.net?'dash-channel-empty':''}"><h4>${name}</h4><div class="dash-channel-line"><span>Fatturato</span><strong>${money(c.fat)}</strong></div><div class="dash-channel-line"><span>Guadagno netto</span><strong class="${c.net>=0?'green':'red'}">${money(c.net)}</strong></div><div class="dash-channel-line"><span>Pezzi</span><strong>${Number.isInteger(c.pieces)?c.pieces:c.pieces.toFixed(1)}</strong></div></div>`).join('');
+  document.getElementById('dashDetailOverlay').classList.remove('hidden')
+}
+function closeDashboardDay(){document.getElementById('dashDetailOverlay').classList.add('hidden')}
+
+/* PAESI */
+function renderCountryFilters(){
+  const yEl=document.getElementById('countryYear'),mEl=document.getElementById('countryMonth'),now=new Date(),sold=soldProductsWithDate(),years=[...new Set([...sold.map(p=>dateKeyParts(p.dataVendita).y),now.getFullYear()])].sort((a,b)=>b-a),oldY=yEl.value||String(now.getFullYear()),oldM=mEl.value||String(now.getMonth()+1).padStart(2,'0');
+  yEl.innerHTML=years.map(y=>`<option value="${y}" ${String(y)===oldY?'selected':''}>${y}</option>`).join('');mEl.innerHTML=Array.from({length:12},(_,i)=>{const v=String(i+1).padStart(2,'0');return`<option value="${v}" ${v===oldM?'selected':''}>${monthName(i+1)}</option>`}).join('')
+}
+function getCountryDays(){
+  const y=Number(document.getElementById('countryYear')?.value||new Date().getFullYear()),m=Number(document.getElementById('countryMonth')?.value||(new Date().getMonth()+1)),daysInMonth=new Date(y,m,0).getDate(),monthSold=soldProductsWithDate().filter(p=>{const d=dateKeyParts(p.dataVendita);return d.y===y&&d.m===m}),countries=[...new Set(monthSold.map(p=>(p.paese||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it',{numeric:true})),rows=Array.from({length:daysInMonth},(_,i)=>({day:i+1,countries:{}}));
+  monthSold.forEach(p=>{const c=(p.paese||'').trim();if(!c)return;const d=dateKeyParts(p.dataVendita).d,row=rows[d-1];if(!row.countries[c])row.countries[c]={fat:0,costo:0,pezzi:0};row.countries[c].fat+=p.vendita||0;row.countries[c].costo+=p.costo||0;row.countries[c].pezzi++});
+  rows.forEach(r=>countries.forEach(c=>{if(r.countries[c])r.countries[c].net=r.countries[c].fat-r.countries[c].costo}));
+  const totals=countries.map(c=>{const t=rows.reduce((a,r)=>{const v=r.countries[c];if(v){a.fat+=v.fat;a.costo+=v.costo;a.pezzi+=v.pezzi}return a},{country:c,fat:0,costo:0,pezzi:0});t.net=t.fat-t.costo;return t});return{year:y,month:m,countries,rows,totals}
+}
+function renderCountries(){
+  renderCountryFilters();const{year,month,countries,rows,totals}=getCountryDays();document.getElementById('countryChips').innerHTML=totals.length?totals.map(t=>`<div class="country-chip">${esc(t.country)} <strong class="green">${money(t.fat)}</strong> <span class="mini">· ${t.pezzi} pezzi</span></div>`).join(''):'<div class="empty">Nessun paese trovato.</div>';
+  document.getElementById('countriesHead').innerHTML=['<tr><th>Giorno</th>',...countries.map(c=>`<th class="num">${esc(c)}</th>`),'</tr>'].join('');
+  document.getElementById('countriesBody').innerHTML=rows.map(r=>`<tr><td class="sku">${String(r.day).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year}</td>${countries.map(c=>{const v=r.countries[c];return v?`<td class="num country-cell"><strong class="green">${money(v.fat)}</strong><span class="${v.net>=0?'green':'red'}">netto ${money(v.net)}</span><span> · ${v.pezzi} pz</span></td>`:'<td class="num">—</td>'}).join('')}</tr>`).join('')
+}
+
+/* AGGIUNGI */
+function updateFormVisibility(){
+  const mode=document.getElementById('mode').value;document.querySelectorAll('.singleOnly').forEach(el=>el.classList.toggle('hidden',mode!=='singolo'));document.querySelectorAll('.groupOnly').forEach(el=>el.classList.toggle('hidden',mode!=='gruppo'));
+  const sold=document.getElementById('newStato').value==='venduto';document.querySelectorAll('.saleOnly').forEach(el=>el.classList.toggle('hidden',!sold));if(!sold)document.getElementById('newDataVendita').value='';
+  const start=parseInt(document.getElementById('seqStart').value||'1',10),end=parseInt(document.getElementById('seqEnd').value||'1',10),count=mode==='gruppo'?Math.max(0,end-start+1):1;document.getElementById('previewAdd').textContent=mode==='gruppo'?`Verranno creati ${count} prodotti.`:'Verrà creato 1 prodotto.'
+}
+function addProducts(){
+  const mode=document.getElementById('mode').value,stato=document.getElementById('newStato').value,costo=parseNum(document.getElementById('newCosto').value),vendita=parseNum(document.getElementById('newVendita').value),dataAcquisto=document.getElementById('newDataAcquisto').value,dataVendita=stato==='venduto'?document.getElementById('newDataVendita').value:'',paese=document.getElementById('newPaese').value.trim(),pagamentoPendente=document.getElementById('newPend').value,note=document.getElementById('newNote').value.trim();let toAdd=[],idBase=products.reduce((m,p)=>Math.max(m,Number(p.id)||0),0)+1;
+  if(mode==='singolo'){const sku=document.getElementById('skuSingolo').value.trim();if(!sku)return alert('Inserisci lo SKU.');const gruppo=groupFromSku(sku),bale=document.getElementById('newBale').value.trim()||gruppo||sku;toAdd.push({id:idBase,sku,gruppo,bale,stato,costo,vendita,dataAcquisto,dataVendita,zona:'',paese,pagamentoPendente,note,piattaforma:'Vinted'})}
+  else{const prefix=document.getElementById('gruppoPrefix').value.trim(),start=parseInt(document.getElementById('seqStart').value,10),end=parseInt(document.getElementById('seqEnd').value,10);if(!prefix||!start||!end||end<start)return alert('Controlla gruppo e sequenza.');const bale=document.getElementById('newBale').value.trim()||prefix;for(let n=start;n<=end;n++)toAdd.push({id:idBase++,sku:`${prefix}-${n}`,gruppo:prefix,bale,stato,costo,vendita,dataAcquisto,dataVendita,zona:'',paese,pagamentoPendente,note,piattaforma:'Vinted'})}
+  const existing=new Set(products.map(p=>p.sku));const dup=toAdd.filter(p=>existing.has(p.sku));if(dup.length&&!confirm(`Ci sono ${dup.length} SKU già presenti. Inserirli comunque?`))return;products.push(...toAdd);saveAll();render();alert(`Caricati ${toAdd.length} prodotti.`)
+}
+
+/* TABS + EVENTI */
+function showTab(id){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));document.querySelectorAll('.tabpage').forEach(p=>p.classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
+document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>showTab(btn.dataset.tab)));
+document.getElementById('tbody').addEventListener('input',e=>{const tr=e.target.closest('tr');if(!tr)return;const idx=Number(tr.dataset.idx),field=e.target.dataset.field;if(!field)return;const p=products[idx];let val=e.target.value;if(['costo','vendita'].includes(field))val=parseNum(val);p[field]=val;if(field==='stato'&&val==='disponibile')p.dataVendita='';saveAll();renderKpis();renderBales();renderDashboard();renderCountries()});
+document.getElementById('tbody').addEventListener('change',e=>{const tr=e.target.closest('tr');if(!tr)return;const idx=Number(tr.dataset.idx),field=e.target.dataset.field;if(!field)return;const p=products[idx];if(field==='stato'&&e.target.value==='venduto'&&!p.dataVendita)p.dataVendita=today();saveAll();render()});
+document.getElementById('tbody').addEventListener('click',e=>{const del=e.target.dataset.delete;if(del!==undefined&&confirm('Eliminare questo prodotto?')){products.splice(Number(del),1);saveAll();render()}});
+document.body.addEventListener('click',e=>{
+  const b=e.target.dataset.viewBale;if(b){document.getElementById('filterBale').value=b;document.getElementById('search').value='';showTab('inventario');currentPage=1;renderTable()}
+  const boxId=e.target.dataset.deleteBox;if(boxId&&confirm('Eliminare solo lo storico della Box? Gli SKU non verranno ripristinati.')){boxes=boxes.filter(x=>x.id!==boxId);saveAll();render()}
+  const ttId=e.target.dataset.deleteTiktok;if(ttId&&confirm('Eliminare solo lo storico TikTok? Gli SKU non verranno ripristinati.')){tiktokEntries=tiktokEntries.filter(x=>x.id!==ttId);saveAll();render()}
+});
+['search','filterStato','filterBale','filterGruppo','sortBy'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{currentPage=1;renderTable()}));
+document.getElementById('prevPageBtn').onclick=()=>{if(currentPage>1){currentPage--;renderTable()}};
+document.getElementById('nextPageBtn').onclick=()=>{const t=Math.max(1,Math.ceil(filteredProducts().length/PAGE_SIZE));if(currentPage<t){currentPage++;renderTable()}};
+['dashYear','dashMonth'].forEach(id=>document.getElementById(id).addEventListener('input',renderDashboard));
+document.getElementById('dashCalendarBtn').addEventListener('click',()=>setDashboardView('calendario'));
+document.getElementById('dashListBtn').addEventListener('click',()=>setDashboardView('lista'));
+document.getElementById('calendarGrid').addEventListener('click',e=>{const btn=e.target.closest('[data-dash-date]');if(btn)openDashboardDay(btn.dataset.dashDate)});
+document.getElementById('dashDetailClose').addEventListener('click',closeDashboardDay);
+document.getElementById('dashDetailOverlay').addEventListener('click',e=>{if(e.target.id==='dashDetailOverlay')closeDashboardDay()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.getElementById('dashDetailOverlay').classList.contains('hidden'))closeDashboardDay()});
+['countryYear','countryMonth'].forEach(id=>document.getElementById(id).addEventListener('input',renderCountries));
+['mode','newStato','seqStart','seqEnd'].forEach(id=>document.getElementById(id).addEventListener('input',updateFormVisibility));
+document.getElementById('addBtn').onclick=addProducts;
+document.getElementById('newBoxBtn').onclick=()=>{document.getElementById('boxForm').classList.remove('hidden');document.getElementById('boxDate').value=today();previewBox()};
+document.getElementById('cancelBoxBtn').onclick=resetBoxForm;document.getElementById('saveBoxBtn').onclick=saveBox;['boxSkus','boxSale'].forEach(id=>document.getElementById(id).addEventListener('input',previewBox));
+document.getElementById('newTikTokBtn').onclick=()=>{document.getElementById('tiktokForm').classList.remove('hidden');document.getElementById('tiktokStartDate').value=today();previewTikTok()};
+document.getElementById('cancelTikTokBtn').onclick=resetTikTokForm;document.getElementById('saveTikTokBtn').onclick=saveTikTok;['tiktokSkus','tiktokIncome','tiktokDays','tiktokStartDate'].forEach(id=>document.getElementById(id).addEventListener('input',previewTikTok));
+document.getElementById('newDataAcquisto').value=today();document.getElementById('boxDate').value=today();document.getElementById('tiktokStartDate').value=today();
+
+/* GOOGLE SHEETS - inventario + archivi BOX / TikTok / WHOP */
+function setSyncStatus(msg,type=''){
+  const el=document.getElementById('syncStatus');
+  el.textContent=msg;el.className='sync-status '+type
+}
+function setArchiveSyncStatus(kind,msg,type=''){
+  const ids={box:'boxSyncStatus',tiktok:'tiktokSyncStatus',whop:'whopSyncStatus'};
+  const el=document.getElementById(ids[kind]);if(!el)return;
+  el.textContent=msg;el.className='archive-sync-status '+type
+}
+function isValidSheetUrl(url){return /^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec(?:[?#].*)?$/.test(String(url||'').trim())}
+function getSheetUrl(){return(document.getElementById('sheetUrl').value||DEFAULT_SHEET_URL||'').trim()}
+function productForSync(p){
+  const n=normalizeProduct({...p});
+  return{id:n.id,sku:n.sku,bale:n.bale,gruppo:n.gruppo,stato:n.stato,costo:n.costo,vendita:n.vendita,dataAcquisto:normalizeDate(n.dataAcquisto),dataVendita:normalizeDate(n.dataVendita),zona:n.zona,paese:n.paese,pagamentoPendente:n.pagamentoPendente,piattaforma:n.piattaforma||'Vinted',note:n.note}
+}
+function loadSheetUrl(){
+  const saved=localStorage.getItem(SHEET_URL_KEY)||'',value=isValidSheetUrl(saved)?saved:DEFAULT_SHEET_URL;
+  document.getElementById('sheetUrl').value=value;localStorage.setItem(SHEET_URL_KEY,value)
+}
+function saveSheetUrl(){
+  const url=getSheetUrl();if(!isValidSheetUrl(url))return setSyncStatus('URL non valido.','err');
+  localStorage.setItem(SHEET_URL_KEY,url);setSyncStatus('URL salvato.','ok')
+}
+function resetSheetUrl(){
+  document.getElementById('sheetUrl').value=DEFAULT_SHEET_URL;
+  localStorage.setItem(SHEET_URL_KEY,DEFAULT_SHEET_URL);setSyncStatus('URL predefinito ripristinato.','ok')
+}
+function sheetRowsToProducts(res){
+  let raw=res&&res.products?res.products:res;
+  if(!Array.isArray(raw)||!raw.length)return[];
+  if(typeof raw[0]==='object'&&!Array.isArray(raw[0]))return raw.map(p=>normalizeProduct({...p}));
+  const headers=(raw[0]||[]).map(h=>String(h||'').trim()),rows=raw.slice(1);
+  return rows.map(row=>{
+    const o={};headers.forEach((h,i)=>o[h]=row[i]);
+    return normalizeProduct({
+      id:o.id||crypto.randomUUID(),sku:o.sku||'',bale:o.bale||'',gruppo:o.gruppo||groupFromSku(o.sku||''),
+      stato:o.stato||'disponibile',costo:parseNum(o.costo),vendita:parseNum(o.vendita),
+      dataAcquisto:o.dataAcquisto??o.data_acquisto??o['Data acquisto']??'',
+      dataVendita:o.dataVendita??o.data_vendita??o['Data vendita']??'',
+      paese:o.paese||'',pagamentoPendente:o.pagamentoPendente??o.pagamento??'NO',
+      piattaforma:o.piattaforma||'Vinted',note:o.note||''
+    })
+  }).filter(p=>p.sku||p.gruppo||p.bale||p.costo||p.vendita)
+}
+function normalizeArchiveRows(res,kind){
+  if(!res)return[];
+  const keys={
+    box:['boxes','box','items','rows','data'],
+    tiktok:['tiktokEntries','tiktok','items','rows','data'],
+    whop:['whopEntries','whop','items','rows','data']
+  }[kind]||['items','rows','data'];
+  for(const key of keys){if(Array.isArray(res[key]))return res[key]}
+  if(Array.isArray(res))return res;
+  return[]
+}
+function jsonpRequest(params,onSuccess,onError){
+  const url=getSheetUrl();if(!isValidSheetUrl(url)){onError(new Error('URL Apps Script non valido'));return}
+  const callback='origoCb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+  const script=document.createElement('script'),sep=url.includes('?')?'&':'?';
+  const qs=new URLSearchParams({...params,callback,t:Date.now()});
+  window[callback]=(res)=>{try{onSuccess(res)}finally{delete window[callback];script.remove()}};
+  script.onerror=()=>{delete window[callback];script.remove();onError(new Error('Errore di connessione al Web App'))};
+  script.src=`${url}${sep}${qs.toString()}`;document.body.appendChild(script)
+}
+function postPayload(payload){
+  const url=getSheetUrl();if(!isValidSheetUrl(url))throw new Error('URL Apps Script non valido');
+  const iframeName='origoSyncFrame';let iframe=document.querySelector(`iframe[name="${iframeName}"]`);
+  if(!iframe){iframe=document.createElement('iframe');iframe.name=iframeName;iframe.style.display='none';document.body.appendChild(iframe)}
+  const form=document.createElement('form');form.method='POST';form.action=url;form.target=iframeName;form.style.display='none';
+  const input=document.createElement('input');input.type='hidden';input.name='payload';input.value=JSON.stringify(payload);
+  form.appendChild(input);document.body.appendChild(form);form.submit();form.remove()
+}
+function getArchive(kind){
+  if(kind==='box')return boxes;
+  if(kind==='tiktok')return tiktokEntries;
+  if(kind==='whop')return whopEntries;
+  return[]
+}
+function setArchive(kind,data){
+  if(kind==='box')boxes=data;
+  if(kind==='tiktok')tiktokEntries=data;
+  if(kind==='whop')whopEntries=data
+}
+function exportArchive(kind,silent=false){
+  const sheetName=SYNC_SHEETS[kind],data=getArchive(kind);
+  try{
+    postPayload({
+      action:'write_archive',
+      archive:kind,
+      sheet:sheetName,
+      sheetName,
+      tab:sheetName,
+      updatedAt:new Date().toISOString(),
+      data,
+      rows:data,
+      source:'origo_html_v16_multisync'
+    });
+    setArchiveSyncStatus(kind,`Esportati ${data.length} record su ${sheetName}.`,'ok');
+    if(!silent)setSyncStatus(`${sheetName}: export inviato.`,'ok')
+  }catch(err){
+    setArchiveSyncStatus(kind,'Errore export: '+err.message,'err');
+    if(!silent)setSyncStatus('Errore export archivio.','err')
+  }
+}
+function importArchive(kind,silent=false,done){
+  const sheetName=SYNC_SHEETS[kind];
+  setArchiveSyncStatus(kind,'Import in corso...');
+  jsonpRequest(
+    {action:'read_archive',archive:kind,sheet:sheetName,sheetName,tab:sheetName},
+    res=>{
+      try{
+        if(res&&res.ok===false)throw new Error(res.error||'Errore Apps Script');
+        const data=normalizeArchiveRows(res,kind);
+        setArchive(kind,data);saveAll();render();
+        setArchiveSyncStatus(kind,`Importati ${data.length} record da ${sheetName}.`,'ok');
+        if(!silent)setSyncStatus(`${sheetName}: import completato.`,'ok');
+        if(done)done(null)
+      }catch(err){
+        setArchiveSyncStatus(kind,'Errore import: '+err.message,'err');
+        if(!silent)setSyncStatus('Errore import archivio.','err');
+        if(done)done(err)
+      }
+    },
+    err=>{
+      setArchiveSyncStatus(kind,'Errore import: '+err.message,'err');
+      if(!silent)setSyncStatus('Errore import archivio.','err');
+      if(done)done(err)
+    }
+  )
+}
+function importAllArchives(){
+  const kinds=['box','tiktok','whop'];let left=kinds.length,errors=0;
+  setSyncStatus('Import archivi in corso...');
+  kinds.forEach(k=>importArchive(k,true,err=>{if(err)errors++;left--;if(left===0)setSyncStatus(errors?`Import archivi completato con ${errors} errore/i.`:'Tutti gli archivi importati.',''+(errors?'err':'ok'))}))
+}
+function exportAllArchives(){
+  ['box','tiktok','whop'].forEach(k=>exportArchive(k,true));
+  setSyncStatus('Export di BOX, TikTok e WHOP inviato.','ok')
+}
+
+/* Import generale:
+   1) importa l'inventario dal sync storico
+   2) se il backend restituisce già gli archivi li usa
+   3) altrimenti prova i tre fogli separati */
+function importFromSheet(){
+  const url=getSheetUrl();if(!isValidSheetUrl(url))return setSyncStatus('URL import errato.','err');
+  const callback='origoImport_'+Date.now(),script=document.createElement('script'),sep=url.includes('?')?'&':'?';
+  window[callback]=(res)=>{
+    try{
+      if(!res)throw new Error('Risposta non valida');
+      if(res.ok===false)throw new Error(res.error||'Errore Apps Script');
+      const incoming=sheetRowsToProducts(res);
+      if(!incoming.length&&!confirm('Nessun prodotto leggibile. Svuotare inventario locale?'))return;
+      products=incoming;
+      let gotArchives=false;
+      if(Array.isArray(res.boxes)){boxes=res.boxes;gotArchives=true}
+      if(Array.isArray(res.tiktokEntries)){tiktokEntries=res.tiktokEntries;gotArchives=true}
+      if(Array.isArray(res.whopEntries)){whopEntries=res.whopEntries;gotArchives=true}
+      currentPage=1;saveAll();render();
+      setSyncStatus(`Inventario importato: ${products.length} prodotti.`,'ok');
+      if(!gotArchives)importAllArchives()
+    }catch(err){setSyncStatus('Errore import: '+err.message,'err')}
+    finally{delete window[callback];script.remove()}
+  };
+  script.onerror=()=>{setSyncStatus('Errore import: controlla URL e permessi.','err');delete window[callback];script.remove()};
+  setSyncStatus('Import inventario in corso...');
+  script.src=`${url}${sep}action=read&callback=${callback}&t=${Date.now()}`;document.body.appendChild(script)
+}
+
+/* Export generale:
+   mantiene il payload storico e invia anche i tre archivi separatamente */
+function exportToSheet(){
+  const url=getSheetUrl();if(!isValidSheetUrl(url))return setSyncStatus('URL export errato.','err');
+  if(!confirm(`Esportare ${products.length} prodotti e sincronizzare BOX, TikTok e WHOP?`))return;
+  try{
+    postPayload({
+      action:'write',
+      source:'origo_html_v16_multisync',
+      updatedAt:new Date().toISOString(),
+      products:products.map(productForSync),
+      boxes,
+      tiktokEntries,
+      whopEntries
+    });
+    exportAllArchives();
+    setSyncStatus('Export inventario + archivi inviato.','ok')
+  }catch(err){setSyncStatus('Errore export: '+err.message,'err')}
+}
+
+document.getElementById('saveSheetUrlBtn').onclick=saveSheetUrl;
+document.getElementById('resetSheetUrlBtn').onclick=resetSheetUrl;
+document.getElementById('importSheetBtn').onclick=importFromSheet;
+document.getElementById('exportSheetBtn').onclick=exportToSheet;
+document.getElementById('importBoxSyncBtn').onclick=()=>importArchive('box');
+document.getElementById('exportBoxSyncBtn').onclick=()=>exportArchive('box');
+document.getElementById('importTikTokSyncBtn').onclick=()=>importArchive('tiktok');
+document.getElementById('exportTikTokSyncBtn').onclick=()=>exportArchive('tiktok');
+document.getElementById('importWhopSyncBtn').onclick=()=>importArchive('whop');
+document.getElementById('exportWhopSyncBtn').onclick=()=>exportArchive('whop');
+document.getElementById('importAllArchivesBtn').onclick=importAllArchives;
+document.getElementById('exportAllArchivesBtn').onclick=exportAllArchives;
+loadSheetUrl();
+
+document.getElementById('exportBtn').onclick=()=>{const headers=['sku','bale','gruppo','stato','costo','vendita','guadagno_venduto','dataAcquisto','dataVendita','paese','pagamentoPendente','note'],lines=[headers.join(';')].concat(products.map(p=>headers.map(h=>{const v=h==='guadagno_venduto'?(isSold(p)?p.vendita-p.costo:0):(p[h]??'');return`"${String(v).replaceAll('"','""')}"`}).join(';'))),blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='origo_gestionale_export.csv';a.click()};
+document.getElementById('resetBtn').onclick=()=>{if(confirm('Ripristinare i 350 prodotti iniziali e cancellare anche storico BOX/TikTok/WHOP locale?')){localStorage.removeItem(KEY);localStorage.removeItem(BOX_KEY);localStorage.removeItem(TIKTOK_KEY);localStorage.removeItem(WHOP_KEY);products=structuredClone(initialProducts);boxes=[];tiktokEntries=[];whopEntries=[];saveAll();render()}};
+
+render();
+</script>
+</body>
+</html>
