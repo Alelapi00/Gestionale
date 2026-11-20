@@ -387,7 +387,7 @@ button.calendar-day:hover{border-color:var(--gold);filter:none}
 
 /* ---------- 1. CONFIG ---------- */
 const PASSWORD = 'origo123';
-const DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxGu9Ut96dAjvteX-y5AKVguMnpQv-3kl2sOYzS4qT-xJzPCaRlcBHhenqktsqK4mhH/exec';
+const DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxWWfy_wM90bVg-8gKWcdbgXsRw_QRUr0BAZPMnHcruUu3z12rhYHtf63MiJhIDCh59/exec';
 const KEYS = {
   products: 'origo_gestionale_v6_sheets', boxes: 'origo_boxes_v15', tiktok: 'origo_tiktok_v15',
   timings: 'origo_bale_times_v16', filters: 'origo_bale_custom_filters_v17', costs: 'origo_costs_v1',
@@ -934,6 +934,7 @@ async function exportArchive(k, silent = false) {
     cleanup();
     if (last && last.ok === false) throw new Error(/non valido/i.test(last.error || '') ? `Il foglio «${a.sheet}» non è ancora abilitato nello script Google: i dati restano salvati su questo computer.` : last.error);
     if (!last || !Array.isArray(last.rows) || last.rows.length !== rows.length) throw new Error(`Export non confermato: sul foglio ${last?.rows?.length ?? '?'} righe invece di ${rows.length}.`);
+    if (k === 'cost') localStorage.setItem('origo_costs_synced_v19', '1');
     setArchiveStatus(k, `Esportato e verificato: ${rows.length} righe · ${fmtWhen(new Date().toISOString())}`, 'ok');
     if (!silent) setSyncStatus(`${a.label}: export verificato.`, 'ok');
     return true;
@@ -947,6 +948,9 @@ async function importArchive(k, silent = false) {
     if (res.ok === false) throw new Error(/non valido/i.test(res.error || '') ? `Il foglio «${a.sheet}» non è ancora abilitato nello script Google.` : res.error);
     const data = rowsToArchive(k, Array.isArray(res.rows) ? res.rows : []);
     if (k === 'baleTiming' && data.length && !data.some(t => t.bale) && baleTimings.some(t => t.bale)) throw new Error('Il foglio non contiene i nomi delle bale: tengo i tempi salvati su questo computer.');
+    /* Prima sincronizzazione dei costi: se il foglio è ancora vuoto non cancello i costi salvati su questo computer. */
+    if (k === 'cost' && !data.length && costs.length && !localStorage.getItem('origo_costs_synced_v19')) throw new Error('Il foglio dei costi è ancora vuoto: tengo i costi di questo computer. Premi Esporta per salvarli sul foglio.');
+    if (k === 'cost') localStorage.setItem('origo_costs_synced_v19', '1');
     setArchive(k, data); saveAll(); render();
     setArchiveStatus(k, `Importati ${data.length} record · ${fmtWhen(new Date().toISOString())}`, 'ok'); return true;
   } catch (e) { setArchiveStatus(k, e.message, 'err'); if (!silent) setSyncStatus(`${a.label}: ${e.message}`, 'err'); return false; }
@@ -1129,6 +1133,8 @@ function init() {
   document.documentElement.dataset.theme = localStorage.getItem(KEYS.theme) || 'dark';
   products.forEach(normalizeProduct); baleTimings = baleTimings.map(normalizeTiming);
   initLogin(); initEvents();
+  /* Il vecchio indirizzo dello script (codice superato) viene sostituito da solo con quello nuovo. */
+  if ((localStorage.getItem(KEYS.sheetUrl) || '').includes('AKfycbxGu9Ut96dAjvteX-y5AKVguMnpQv')) localStorage.removeItem(KEYS.sheetUrl);
   $('sheetUrl').value = localStorage.getItem(KEYS.sheetUrl) || DEFAULT_SHEET_URL;
   ['newDataAcquisto', 'boxDate', 'tiktokStartDate', 'costDate'].forEach(id => $(id).value = today());
   showTab('dashboard');
